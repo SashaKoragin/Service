@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension" xmlns:net="http://schemas.microsoft.com/wix/NetFxExtension">
+
+  <?define CurrentVersion="!(bind.fileVersion.ServiceOutlook.exe)"?>
+  <Product Id="*" Name="SetupServiceOutlook $(var.CurrentVersion)" Codepage="1251" Language="1049" Version="$(var.CurrentVersion)" Manufacturer="ServiceOutlook" UpgradeCode="daebdddc-eb0f-4c1e-b1bf-1d2aa58ade82">
+		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
+
+    <Upgrade Id="4315D490-50F6-4626-AC1E-069F7C6E073D">
+      <UpgradeVersion OnlyDetect="yes" Minimum="1.0.0.0" IncludeMinimum="yes" Maximum="$(var.CurrentVersion)" IncludeMaximum="no" Property="PREVIOUSFOUND" Language="1049" IgnoreRemoveFailure="yes" />
+    </Upgrade>
+
+    <MajorUpgrade Schedule="afterInstallInitialize" DowngradeErrorMessage="Более новая версия уже установлена!" />
+    <MediaTemplate EmbedCab="yes" />
+
+    <WixVariable Id="WixUIBannersBmp" Value="bmp\installer_banner_wix.bmp" />
+    <WixVariable Id="WixUIDialogBmp" Value="bmp\installer_background_wix.bmp" />
+    <WixVariable Id="WixUILicenseRtf" Value="License\License.rtf" />
+
+    <!--Диалоговые окна по ссылкам UI-->
+    <Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
+    <UIRef Id="WixUI_MyInstallDir" />
+
+		<Feature Id="ProductFeature" Title="SetupServiceOutlook" Level="1">
+			<ComponentGroupRef Id="ProductComponents" />
+      <ComponentRef Id="CreateFolderMail" />
+      <ComponentRef Id="Clear" />
+      <ComponentRef Id="CreateLog" />
+		</Feature>
+	</Product>
+
+	<Fragment>
+		<Directory Id="TARGETDIR" Name="SourceDir">
+			<Directory Id="ProgramFilesFolder">
+				<Directory Id="INSTALLFOLDER" Name="SetupServiceOutlook" >
+          <Directory Id="INSTALLLOCATION" />
+        </Directory>
+			</Directory>
+		</Directory>
+	</Fragment>
+
+  <Fragment>
+    <DirectoryRef Id="INSTALLLOCATION">
+      <Directory Id="PathMail" Name="Mail">
+        <Component Id="CreateFolderMail" Guid="37097F8A-5D2D-4D2E-A4AE-11F4A3A22F83">
+          <CreateFolder />
+        </Component>
+      </Directory>
+    </DirectoryRef>
+  </Fragment>
+
+  <Fragment>
+    <DirectoryRef Id="INSTALLLOCATION">
+      <Component Id="Clear" Guid="D2F4EDCE-7D9F-4BDA-B7ED-6CA44252FAFB">
+        <CreateFolder Directory="INSTALLLOCATION" />
+        <RemoveFile Id="RemoveFileMail" On="uninstall" Name="*.*" Directory="PathMail" />
+        <RemoveFolder Id="RemoveFolderMail" On="uninstall" Directory="PathMail" />
+        <RemoveFile Id="RemoveFileLog" On="uninstall" Name="*.*" Directory="PathLog" />
+        <RemoveFolder Id="RemoveFolderLog" On="uninstall" Directory="PathLog" />
+      </Component>
+    </DirectoryRef>
+  </Fragment>
+
+  <Fragment>
+    <DirectoryRef Id="INSTALLLOCATION">
+      <Directory Id="PathLog" Name="Log">
+        <Component Id="CreateLog" Guid="A4D9C0ED-981F-439C-AE7C-896281BFC73A">
+          <CreateFolder />
+        </Component>
+      </Directory>
+    </DirectoryRef>
+  </Fragment>
+
+
+	<Fragment>
+		<ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+      <Component Id="ServiceOutlook.exe" Guid="e4351c62-eb22-4fd3-aff0-6f328bd4603f">
+        <File Id="ServiceOutlook.exe" Name="ServiceOutlook.exe" Source="$(var.ServiceOutlook.TargetDir)ServiceOutlook.exe" />
+        <ServiceInstall Id="ServiceInstall" Type="ownProcess" Interactive="yes" Vital="yes" Description="Служба для Outlook рассылки писем!!!" Name="ServiceOutlook" Start="auto" ErrorControl="normal" />
+        <ServiceControl Id="ServiceRemove" Name="ServiceOutlook" Start="install" Stop="both" Remove="uninstall" Wait="yes" />
+      </Component>
+
+      <Component Id="ServiceOutlook.exe.config" Guid="e8d4b8c7-7cb8-4112-be35-4d5eaba90157">
+			  <File Id="ServiceOutlook.exe.config" Name="ServiceOutlook.exe.config" Source="$(var.ServiceOutlook.TargetDir)ServiceOutlook.exe.config" KeyPath="yes" Vital="yes" />
+        <util:XmlFile Id="IntervalParam" File="[#ServiceOutlook.exe.config]" Action="setValue" ElementPath="//configuration//appSettings//add[\[]@key='Interval'[\]]//@value" Value="[INTERVAL]" SelectionLanguage="XPath" Sequence="1" />
+        <util:XmlFile Id="Pop3AddressParam" File="[#ServiceOutlook.exe.config]" Action="setValue" ElementPath="//configuration//appSettings//add[\[]@key='Pop3Address'[\]]//@value" Value="[ADDRESS]" SelectionLanguage="XPath" Sequence="1" />
+        <util:XmlFile Id="LoginParam" File="[#ServiceOutlook.exe.config]" Action="setValue" ElementPath="//configuration//appSettings//add[\[]@key='LoginOit'[\]]//@value" Value="[LOGIN]" SelectionLanguage="XPath" Sequence="1" />
+        <util:XmlFile Id="PasswordParam" File="[#ServiceOutlook.exe.config]" Action="setValue" ElementPath="//configuration//appSettings//add[\[]@key='PasswordOit'[\]]//@value" Value="[PASSWORD]" SelectionLanguage="XPath" Sequence="1" />
+        <util:XmlFile Id="PathSaveArchiveParam" File="[#ServiceOutlook.exe.config]" Action="setValue" ElementPath="//configuration//appSettings//add[\[]@key='PathSaveArchive'[\]]//@value" Value="[INSTALLFOLDER]Mail\" SelectionLanguage="XPath" Sequence="1" />
+        <util:XmlFile Id="LotusServerParam" File="[#ServiceOutlook.exe.config]" Action="setValue" ElementPath="//configuration//appSettings//add[\[]@key='LotusServer'[\]]//@value" Value="[LOTUSSERVER]" SelectionLanguage="XPath" Sequence="1" />
+        <util:XmlFile Id="LotusPasswordParam" File="[#ServiceOutlook.exe.config]" Action="setValue" ElementPath="//configuration//appSettings//add[\[]@key='LotusIdFilePassword'[\]]//@value" Value="[LOTUSPASSWORD]" SelectionLanguage="XPath" Sequence="1" />
+        <util:XmlFile Id="LotusMailSendParam" File="[#ServiceOutlook.exe.config]" Action="setValue" ElementPath="//configuration//appSettings//add[\[]@key='LotusMailSend'[\]]//@value" Value="[LOTUSMAILSEND]" SelectionLanguage="XPath" Sequence="1" />
+        <util:XmlFile Id="PathGenerateScheme" File="[#ServiceOutlook.exe.config]" Action="setValue" ElementPath="//configuration//appSettings//add[\[]@key='PathGenerateScheme'[\]]//@value" Value="[INSTALLFOLDER]Mail\scheme.dxl" SelectionLanguage="XPath" Sequence="1" />
+        <util:XmlFile Id="DataBase" File="[#ServiceOutlook.exe.config]" Action="setValue" ElementPath="//configuration//connectionStrings//add[\[]@name='Inventarization'[\]]//@connectionString" Value="Data Source=[SERVER];Initial Catalog=[NAME];Integrated Security=True;MultipleActiveResultSets=True" SelectionLanguage="XPath" Sequence="1" />
+      </Component>
+			<Component Id="Loggers.dll" Guid="ec2baafa-12e3-4ab5-bd4d-fe97192ceb1a">
+			  <File Id="Loggers.dll" Name="Loggers.dll" Source="$(var.ServiceOutlook.TargetDir)Loggers.dll" />
+			</Component>
+			<Component Id="LibraryOutlook.dll" Guid="ad4f7451-7e4f-4ebd-8582-8692fe6d6f89">
+			  <File Id="LibraryOutlook.dll" Name="LibraryOutlook.dll" Source="$(var.ServiceOutlook.TargetDir)LibraryOutlook.dll" />
+			</Component>
+			<Component Id="EfDatabase.dll" Guid="c7b5679d-8810-42a6-b0c9-6311f2bbdf5f">
+			  <File Id="EfDatabase.dll" Name="EfDatabase.dll" Source="$(var.ServiceOutlook.TargetDir)EfDatabase.dll" />
+			</Component>
+			<Component Id="LibaryXMLAuto.dll" Guid="ec75a68d-55b8-4260-b5cb-16fb2126e561">
+			  <File Id="LibaryXMLAuto.dll" Name="LibaryXMLAuto.dll" Source="$(var.ServiceOutlook.TargetDir)LibaryXMLAuto.dll" />
+			</Component>
+			<Component Id="LotusLibrary.dll" Guid="6344bf60-8ada-422b-a871-d933ee8903a0">
+			  <File Id="LotusLibrary.dll" Name="LotusLibrary.dll" Source="$(var.ServiceOutlook.TargetDir)LotusLibrary.dll" />
+			</Component>
+      <Component Id="EntityFramework.SqlServer.dll" Guid="3F572F3C-2E62-4511-B338-3A6E434A248F">
+        <File Id="EntityFramework.SqlServer.dll" Name="EntityFramework.SqlServer.dll" Source="$(var.ServiceOutlook.TargetDir)EntityFramework.SqlServer.dll" />
+      </Component>
+      <Component Id="EntityFramework.dll" Guid="DCA4D5FB-CB00-465E-A812-B4DF834B9908">
+        <File Id="EntityFramework.dll" Name="EntityFramework.dll" Source="$(var.ServiceOutlook.TargetDir)EntityFramework.dll" />
+      </Component>
+      <Component Id="NLog.dll" Guid="C194AAFE-5DF8-49F0-8170-68C6E2F61833">
+        <File Id="NLog.dll" Name="NLog.dll" Source="$(var.ServiceOutlook.TargetDir)NLog.dll" />
+      </Component>
+      <Component Id="DotNetZip.dll" Guid="5987C217-F669-458C-98A0-9036FBC80DB8">
+        <File Id="DotNetZip.dll" Name="DotNetZip.dll" Source="$(var.ServiceOutlook.TargetDir)DotNetZip.dll"/>
+      </Component>
+      <Component Id="OpenPop.dll" Guid="90E4F4C0-F564-4311-B6C4-47DF9B31394D">
+        <File Id="OpenPop.dll" Name="OpenPop.dll" Source="$(var.ServiceOutlook.TargetDir)OpenPop.dll"/>
+      </Component>
+		</ComponentGroup>
+	</Fragment>
+</Wix>

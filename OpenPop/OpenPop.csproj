@@ -1,0 +1,86 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ProjectGuid>{DA6BE763-8DA2-46ED-9912-CF3C941936AF}</ProjectGuid>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <OutputType>Library</OutputType>
+    <LangVersion>8.0</LangVersion>
+    <AssemblyName>OpenPop</AssemblyName>
+    <TargetFrameworkIdentifier>.NETFramework</TargetFrameworkIdentifier>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Platform)' == 'AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <OutputPath>bin\Debug\</OutputPath>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <OutputPath>bin\Release\</OutputPath>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System">
+      <HintPath>C:\Windows\Microsoft.Net\assembly\GAC_MSIL\System\v4.0_4.0.0.0__b77a5c561934e089\System.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Security" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="OpenPop.Common.Logging\DefaultLogger.cs" />
+    <Compile Include="OpenPop.Common.Logging\DiagnosticsLogger.cs" />
+    <Compile Include="OpenPop.Common.Logging\FileLogger.cs" />
+    <Compile Include="OpenPop.Common.Logging\ILog.cs" />
+    <Compile Include="OpenPop.Common\StreamUtility.cs" />
+    <Compile Include="OpenPop.Mime.Decode\Base64.cs" />
+    <Compile Include="OpenPop.Mime.Decode\EncodedWord.cs" />
+    <Compile Include="OpenPop.Mime.Decode\EncodingFinder.cs" />
+    <Compile Include="OpenPop.Mime.Decode\QuotedPrintable.cs" />
+    <Compile Include="OpenPop.Mime.Decode\Rfc2231Decoder.cs" />
+    <Compile Include="OpenPop.Mime.Decode\Rfc2822DateTime.cs" />
+    <Compile Include="OpenPop.Mime.Decode\SizeParser.cs" />
+    <Compile Include="OpenPop.Mime.Decode\Utility.cs" />
+    <Compile Include="OpenPop.Mime.Header\ContentTransferEncoding.cs" />
+    <Compile Include="OpenPop.Mime.Header\HeaderExtractor.cs" />
+    <Compile Include="OpenPop.Mime.Header\HeaderFieldParser.cs" />
+    <Compile Include="OpenPop.Mime.Header\MessageHeader.cs" />
+    <Compile Include="OpenPop.Mime.Header\Received.cs" />
+    <Compile Include="OpenPop.Mime.Header\RfcMailAddress.cs" />
+    <Compile Include="OpenPop.Mime.Traverse\AnswerMessageTraverser.cs" />
+    <Compile Include="OpenPop.Mime.Traverse\AttachmentFinder.cs" />
+    <Compile Include="OpenPop.Mime.Traverse\FindAllMessagePartsWithMediaType.cs" />
+    <Compile Include="OpenPop.Mime.Traverse\FindFirstMessagePartWithMediaType.cs" />
+    <Compile Include="OpenPop.Mime.Traverse\IAnswerMessageTraverser.cs" />
+    <Compile Include="OpenPop.Mime.Traverse\IQuestionAnswerMessageTraverser.cs" />
+    <Compile Include="OpenPop.Mime.Traverse\MultipleMessagePartFinder.cs" />
+    <Compile Include="OpenPop.Mime.Traverse\TextVersionFinder.cs" />
+    <Compile Include="OpenPop.Mime\Message.cs" />
+    <Compile Include="OpenPop.Mime\MessageInfo.cs" />
+    <Compile Include="OpenPop.Mime\MessagePart.cs" />
+    <Compile Include="OpenPop.Pop3.Exceptions\InvalidLoginException.cs" />
+    <Compile Include="OpenPop.Pop3.Exceptions\InvalidUseException.cs" />
+    <Compile Include="OpenPop.Pop3.Exceptions\LoginDelayException.cs" />
+    <Compile Include="OpenPop.Pop3.Exceptions\PopClientException.cs" />
+    <Compile Include="OpenPop.Pop3.Exceptions\PopServerException.cs" />
+    <Compile Include="OpenPop.Pop3.Exceptions\PopServerLockedException.cs" />
+    <Compile Include="OpenPop.Pop3.Exceptions\PopServerNotAvailableException.cs" />
+    <Compile Include="OpenPop.Pop3.Exceptions\PopServerNotFoundException.cs" />
+    <Compile Include="OpenPop.Pop3\Apop.cs" />
+    <Compile Include="OpenPop.Pop3\AuthenticationMethod.cs" />
+    <Compile Include="OpenPop.Pop3\ConnectionState.cs" />
+    <Compile Include="OpenPop.Pop3\CramMd5.cs" />
+    <Compile Include="OpenPop.Pop3\Disposable.cs" />
+    <Compile Include="OpenPop.Pop3\Pop3Client.cs" />
+    <Compile Include="OpenPop\IParsingErrorHandler.cs" />
+    <Compile Include="OpenPop\ParseError.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
