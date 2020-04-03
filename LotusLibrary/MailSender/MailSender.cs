@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Runtime.InteropServices;
 using Domino;
 using EfDatabase.Inventory.Base;
 using LotusLibrary.DbConnected;
@@ -89,6 +90,7 @@ namespace LotusLibrary.MailSender
 
         public void Dispose()
         {
+
             Config = null;
             Db = null;
         }

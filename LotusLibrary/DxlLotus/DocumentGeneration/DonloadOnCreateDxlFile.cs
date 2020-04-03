@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
 using Domino;
@@ -19,12 +17,15 @@ namespace LotusLibrary.DxlLotus.DocumentGeneration
         /// <param name="db">БД</param>
         public string ImportDxlFile(string fileName, NotesDatabase db)
         {
-            NotesStream notesStream = db.Parent.CreateStream();
+            NotesStream notesStream = null;
+            NotesDXLImporter notesDXLImporter = null;
+            notesStream = db.Parent.CreateStream();
+            notesDXLImporter = db.Parent.CreateDXLImporter();
             if (!notesStream.Open(fileName))
             {
                 Loggers.Log4NetLogger.Error(new Exception("Невозможно открыть файл " + fileName));
+                return null;
             }
-            NotesDXLImporter notesDXLImporter = db.Parent.CreateDXLImporter();
             notesDXLImporter.ACLImportOption = DXLIMPORTOPTION.DXLIMPORTOPTION_UPDATE_ELSE_IGNORE;
             notesDXLImporter.DesignImportOption = DXLIMPORTOPTION.DXLIMPORTOPTION_REPLACE_ELSE_CREATE;
             notesDXLImporter.ReplicaRequiredForReplaceOrUpdate = false;
@@ -38,11 +39,18 @@ namespace LotusLibrary.DxlLotus.DocumentGeneration
                 notesStream.Close();
                 return text;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Loggers.Log4NetLogger.Error(new Exception(notesDXLImporter.Log));
                 Loggers.Log4NetLogger.Error(new Exception(notesDXLImporter.LogComment));
                 Loggers.Log4NetLogger.Error(e);
+            }
+            finally
+            {
+                if (notesDXLImporter != null)
+                    Marshal.ReleaseComObject(notesDXLImporter);
+                if (notesStream != null)
+                    Marshal.ReleaseComObject(notesStream);
             }
             return null;
         }

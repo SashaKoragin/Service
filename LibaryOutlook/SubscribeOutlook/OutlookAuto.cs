@@ -235,6 +235,5 @@ namespace LibraryOutlook.SubscribeOutlook
                 Loggers.Log4NetLogger.Debug(x);
             }
        }
-
    }
 }

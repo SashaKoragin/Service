@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using Domino;
 
 namespace LotusLibrary.DbConnected
@@ -85,11 +86,10 @@ namespace LotusLibrary.DbConnected
 
         public void Dispose()
         {
-            if (Session != null)
-            {
-                Db = null;
-                Session = null;
-            }
+            if (Db != null)
+                Marshal.ReleaseComObject(Db);
+            if (Session!= null)
+                Marshal.ReleaseComObject(Session);
         }
     }
 }
