@@ -2,12 +2,10 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Globalization;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Domino;
-using EfDatabase.Inventory.Base;
+
 
 namespace LotusLibrary.DxlLotus.DocumentGeneration
 {
@@ -29,10 +27,10 @@ namespace LotusLibrary.DxlLotus.DocumentGeneration
             Document.textproperties = null;
             Document.noteinfo.noteid = "0";
             Document.noteinfo.sequence = "0";
-            Document.noteinfo.created.datetime.Text = new List<string>(new string[] { DateTime.Now.ToString() });
+            Document.noteinfo.created.datetime.Text = new List<string>(new[] { DateTime.Now.ToString(CultureInfo.InvariantCulture) });
             Document.noteinfo.modified.datetime.Text = new List<string>(new string[] {  });
-            Document.noteinfo.revised.datetime.Text = new List<string>(new string[] { DateTime.Now.ToString() });
-            Document.noteinfo.lastaccessed.datetime.Text = new List<string>(new string[] { DateTime.Now.ToString() });
+            Document.noteinfo.revised.datetime.Text = new List<string>(new[] { DateTime.Now.ToString(CultureInfo.InvariantCulture) });
+            Document.noteinfo.lastaccessed.datetime.Text = new List<string>(new[] { DateTime.Now.ToString(CultureInfo.InvariantCulture) });
             Document.noteinfo.addedtofile.datetime.Text = new List<string>(new string[] {  });
 
         }
@@ -48,21 +46,21 @@ namespace LotusLibrary.DxlLotus.DocumentGeneration
         {
             Document.Items.Add(new item() { name = "Subject", Item = GenerateText(new[] { subject }) });
             Document.Items.Add(new item() { name = "Recipients", Item = GenerateText(new[] { sender }) });
-            Document.Items.Add(new item() { name = "PostedDate", Item = GenerateText(new[] { DateTime.Now.ToString()}) });
+            Document.Items.Add(new item() { name = "PostedDate", Item = GenerateText(new[] { DateTime.Now.ToString(CultureInfo.InvariantCulture)}) });
             Document.Items.Add(new item() { name = "Form", Item = GenerateText(new[] { "Memo"}) });
-            Document.Items.Add(new item() { name = "AltFrom", Item = new textlist() { text = new List<text>(new text[] { GenerateText(new string[] { }) }) } });
+            Document.Items.Add(new item() { name = "AltFrom", Item = new textlist() { text = new List<text>(new[] { GenerateText(new string[] { }) }) } });
             Document.Items.Add(new item() { name = "Logo", Item = GenerateText(new[] { "StdNotesLtrGateway"}) });
             Document.Items.Add(new item() { name = "useApplet", Item = GenerateText(new[] { "True"}) });
             Document.Items.Add(new item() { name = "DefaultMailSaveOptions", Item = GenerateText(new[] { "1"}) });
-            Document.Items.Add(new item() { name = "Query_String", Item = new textlist() { text = new List<text>(new text[] { GenerateText(new string[] { }) }) } });
+            Document.Items.Add(new item() { name = "Query_String", Item = new textlist() { text = new List<text>(new[] { GenerateText(new string[] { }) }) } });
             Document.Items.Add(new item() { name = "Encrypt", Item = GenerateText(new[] { "0"}) });
             Document.Items.Add(new item() { name = "Sign", Item = GenerateText(new[] { "0"}) });
             Document.Items.Add(new item() { name = "BlindCopyTo", names = itemNames.@true, Item = GenerateText(new string[] { }) });
             Document.Items.Add(new item() { name = "WebSubject", names = itemNames.@true, Item = GenerateText(new[] { sender }) });
             Document.Items.Add(new item() { name = "FaxToList", names = itemNames.@true, Item = GenerateText(new string[] { }) });
-            Document.Items.Add(new item() { name = "EnterSendTo", Item = new textlist() { text = new List<text>(new text[] { GenerateText(new[] { sender }) }) } });
-            Document.Items.Add(new item() { name = "EnterCopyTo", Item = new textlist() { text = new List<text>(new text[] { GenerateText(new string[] { }) }) } });
-            Document.Items.Add(new item() { name = "EnterBlindCopyTo", Item = new textlist() { text = new List<text>(new text[] { GenerateText(new string[] { }) }) } });
+            Document.Items.Add(new item() { name = "EnterSendTo", Item = new textlist() { text = new List<text>(new[] { GenerateText(new[] { sender }) }) } });
+            Document.Items.Add(new item() { name = "EnterCopyTo", Item = new textlist() { text = new List<text>(new[] { GenerateText(new string[] { }) }) } });
+            Document.Items.Add(new item() { name = "EnterBlindCopyTo", Item = new textlist() { text = new List<text>(new[] { GenerateText(new string[] { }) }) } });
             Document.Items.Add(new item() { name = "OriginalTo", Item = GenerateText(new[] { sender }) });
             Document.Items.Add(new item() { name = "SendTo", Item = GenerateTextList(sendTo) });
             Document.Items.Add(new item() { name = "OriginalFrom", Item = GenerateText(new[] { sender }) });
@@ -117,10 +115,7 @@ namespace LotusLibrary.DxlLotus.DocumentGeneration
                 {
                     Items = new List<object>()
                     {
-                        new @break()
-                        {
-
-                        },
+                        new @break(),
                         GetPicture(filePathName)
                     }
                 };
@@ -168,14 +163,14 @@ namespace LotusLibrary.DxlLotus.DocumentGeneration
                 paragraph.Items.Add(new run()
                 {
                     Items = new List<object>() {new font() {size = "14pt"}},
-                    Text = new List<string>(new string[] { paragraphText })
+                    Text = new List<string>(new[] { paragraphText })
                 });
-                paragraph.Items.Add(new @break() { });
+                paragraph.Items.Add(new @break());
             }
             return paragraph;
         }
 
-        public textlist GenerateTextList(string[] arrayText)
+        private textlist GenerateTextList(string[] arrayText)
         {
             var i = 0;
             var textArray = new text[arrayText.Length];
@@ -199,58 +194,72 @@ namespace LotusLibrary.DxlLotus.DocumentGeneration
         private attachmentref GetPicture(string filePathName)
         {
             var nameFile = Path.GetFileName(filePathName);
-                using (var font = new System.Drawing.Font("Tahoma", 8))
+                using (var font = new Font("Tahoma", 8))
                 {
                     SizeF textSize = new SizeF();
-                    using (var iconBitmap = Icon.ExtractAssociatedIcon(filePathName))
-                    {
-                        float yShift = 0f;
-                        using (var tempBitmap = new Bitmap(iconBitmap.Width, iconBitmap.Height))
+                    if (filePathName != null)
+                        using (var iconBitmap = Icon.ExtractAssociatedIcon(filePathName))
                         {
-                            using (var drawing = Graphics.FromImage(tempBitmap))
+                            float yShift = 0f;
+                            if (iconBitmap != null)
                             {
-                                var sz = drawing.MeasureString(filePathName, font);
-                                textSize.Width = iconBitmap.Width + sz.Width + 10;
-                                textSize.Height = Math.Max(sz.Height, iconBitmap.Height);
-                                if (sz.Height < iconBitmap.Height)
-                                    yShift = (iconBitmap.Height - sz.Height) / 2;
-                            }
-                        }
-                        using (var img = new Bitmap((int) textSize.Width, (int) textSize.Height))
-                        {
-                            using (var drawing = Graphics.FromImage(img))
-                            {
-                                drawing.Clear(Color.White);
-                                drawing.DrawImage(iconBitmap.ToBitmap(), System.Drawing.Point.Empty);
-                                using (var textBrush = new SolidBrush(Color.Black))
+                                using (var tempBitmap = new Bitmap(iconBitmap.Width, iconBitmap.Height))
                                 {
-                                    drawing.DrawString(nameFile, font, textBrush, iconBitmap.Width + 10, yShift);
-                                    drawing.Save();
-                                }
-                            }
-                            using (var ms = new MemoryStream())
-                            {
-                                img.Save(ms, ImageFormat.Gif);
-                                var reattachment = new attachmentref()
-                                {
-                                    name = nameFile,
-                                    displayname = nameFile,
-                                    caption = nameFile,
-                                    Items = new List<object>()
+                                    using (var drawing = Graphics.FromImage(tempBitmap))
                                     {
-                                        new picture()
+                                        var sz = drawing.MeasureString(filePathName, font);
+                                        textSize.Width = iconBitmap.Width + sz.Width + 10;
+                                        textSize.Height = Math.Max(sz.Height, iconBitmap.Height);
+                                        if (sz.Height < iconBitmap.Height)
+                                            yShift = (iconBitmap.Height - sz.Height) / 2;
+                                    }
+                                }
+
+                                using (var img = new Bitmap((int) textSize.Width, (int) textSize.Height))
+                                {
+                                    using (var drawing = Graphics.FromImage(img))
+                                    {
+                                        drawing.Clear(Color.White);
+                                        drawing.DrawImage(iconBitmap.ToBitmap(), Point.Empty);
+                                        using (var textBrush = new SolidBrush(Color.Black))
                                         {
-                                            height = $"{textSize.Height}px",
-                                            width = $"{textSize.Width}px",
-                                            Item = new gif() {Text = new List<string>(new[] {Convert.ToBase64String(ms.ToArray())})}
+                                            drawing.DrawString(nameFile, font, textBrush, iconBitmap.Width + 10,
+                                                yShift);
+                                            drawing.Save();
                                         }
                                     }
-                                };
-                                return reattachment;
+
+                                    using (var ms = new MemoryStream())
+                                    {
+                                        img.Save(ms, ImageFormat.Gif);
+                                        var reattachment = new attachmentref()
+                                        {
+                                            name = nameFile,
+                                            displayname = nameFile,
+                                            caption = nameFile,
+                                            Items = new List<object>()
+                                            {
+                                                new picture()
+                                                {
+                                                    height = $"{textSize.Height}px",
+                                                    width = $"{textSize.Width}px",
+                                                    Item = new gif()
+                                                    {
+                                                        Text = new List<string>(
+                                                            new[] {Convert.ToBase64String(ms.ToArray())})
+                                                    }
+                                                }
+                                            }
+                                        };
+                                        return reattachment;
+                                    }
+                                }
                             }
+
+                           
                         }
-                    }
-                }
+                    return null;
+            }
         }
 
         public void Dispose()
