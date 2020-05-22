@@ -62,7 +62,6 @@
     <Compile Include="DxlLotus\DocumentGeneration\DonloadOnCreateDxlFile.cs" />
     <Compile Include="DxlLotus\domino_6_5_5.designer.cs" />
     <Compile Include="MailSender\MailSender.cs" />
-    <Compile Include="MemoDocument\DocumentMail\MemoMail.cs" />
     <Compile Include="Mime\AllMime.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PublicFunctionInfo\PublicFunctionInfo.cs" />

@@ -88,8 +88,10 @@ namespace LotusLibrary.DbConnected
         {
             if (Db != null)
                 Marshal.ReleaseComObject(Db);
+            Db = null;
             if (Session!= null)
                 Marshal.ReleaseComObject(Session);
+            Session = null;
         }
     }
 }

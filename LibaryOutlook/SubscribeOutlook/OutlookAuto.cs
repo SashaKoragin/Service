@@ -28,6 +28,7 @@ namespace LibraryOutlook.SubscribeOutlook
                 using (Pop3Client client = new Pop3Client())
                 {
                     client.Connect(parameters.Pop3Address, 995, true);
+                    MailSender mail = new MailSender();
                     Loggers.Log4NetLogger.Info(new Exception($"Соединение с сервером eups.tax.nalog.ru установлено (OIT)"));
                     client.Authenticate(parameters.LoginOit, parameters.PasswordOit, AuthenticationMethod.UsernameAndPassword);
                     Loggers.Log4NetLogger.Info(new Exception($"Пользователь проверен (OIT)"));
@@ -68,7 +69,7 @@ namespace LibraryOutlook.SubscribeOutlook
                                         FileMail = zip.StartZipArchive(message.FindAllAttachments(),fullPath)
                                     };
                                     mailSave.AddModel(mailMessage);
-                                    MailSender mail = new MailSender();
+                                    
                                     if (mailMessage.SubjectMail != null)
                                     {
                                         UserLotus userSql = null;
@@ -111,9 +112,12 @@ namespace LibraryOutlook.SubscribeOutlook
                         }
                         Loggers.Log4NetLogger.Info(new Exception("Количество пришедшей (OIT) почты:" + count));
                     }
+                    mail.Dispose();
+                    client.Disconnect();
                 }
                 foreach (FileInfo file in new DirectoryInfo(parameters.PathSaveArchive).GetFiles())
                 {
+                    Loggers.Log4NetLogger.Info(new Exception($"Наименование удаленных файлов: {file.FullName}"));
                     file.Delete();
                 }
                 Loggers.Log4NetLogger.Info(new Exception("Очистили папку от файлов (OIT)!"));
@@ -137,6 +141,7 @@ namespace LibraryOutlook.SubscribeOutlook
                 using (Pop3Client client = new Pop3Client())
                 {
                     client.Connect(parameters.Pop3Address, 995, true);
+                    MailSender mail = new MailSender();
                     Loggers.Log4NetLogger.Info(new Exception($"Соединение с сервером eups.tax.nalog.ru установлено (R7751)"));
                     client.Authenticate(parameters.LoginR7751, parameters.PasswordR7751, AuthenticationMethod.UsernameAndPassword);
                     Loggers.Log4NetLogger.Info(new Exception($"Пользователь проверен (R7751)"));
@@ -200,9 +205,6 @@ namespace LibraryOutlook.SubscribeOutlook
                                         //Если нашли пользователя в БД
                                         if (userSql?.User != null && userSql.User.Length > 0)
                                         {
-
-
-                                            MailSender mail = new MailSender();
                                             var mailUsers = mail.FindUserLotusMail(userSql, "(R7751)");
                                             if (mailUsers.Length > 0)
                                             {
@@ -222,9 +224,12 @@ namespace LibraryOutlook.SubscribeOutlook
                         }
                         Loggers.Log4NetLogger.Info(new Exception("Количество пришедшей почты (R7751):" + count));
                     }
+                    mail.Dispose();
+                    client.Disconnect();
                 }
                 foreach (FileInfo file in new DirectoryInfo(parameters.PathSaveArchive).GetFiles())
                 {
+                    Loggers.Log4NetLogger.Info(new Exception($"Наименование удаленных файлов: {file.FullName}"));
                     file.Delete();
                 }
                 Loggers.Log4NetLogger.Info(new Exception("Очистили папку от файлов! (R7751)"));

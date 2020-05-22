@@ -3,15 +3,17 @@ using System.ServiceProcess;
 using System.ServiceModel;
 using System.Threading;
 using ServiceOutlook.Service;
-using System.Windows.Forms;
-using LibraryOutlook.Forms;
 
+
+using LibraryOutlook.StartTaskOutlook;
 
 
 namespace ServiceOutlook
 {
     public partial class ServiceOutlook : ServiceBase
     {
+
+        public StartTaskOutlook Task { get; set; }
         public ServiceOutlook()
         {
             InitializeComponent();
@@ -29,20 +31,20 @@ namespace ServiceOutlook
 
         void StartOutlook()
         {
+            Task = new StartTaskOutlook();
             Loggers.Log4NetLogger.Info(new Exception("Запустили сервис переправки писем!"));
-            Application.Run(new FormStartAutoService());
         }
 
         protected override void OnStop()
         {
             try
             {
+                Task?.Dispose();
                 if (Service != null)
                 {
                     Service.Close();
                     Service = null;
                 }
-                Application.Exit();
                 Loggers.Log4NetLogger.Info(new Exception("Остановили сервис переправки писем!"));
             }
             catch (Exception e)

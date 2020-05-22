@@ -8,8 +8,17 @@ using Domino;
 
 namespace LotusLibrary.DxlLotus.DocumentGeneration
 {
-   public class DonloadOnCreateDxlFile
+   public class DonloadOnCreateDxlFile:IDisposable
     {
+        public NotesStream NotesStream { get; set; }
+
+        public NotesDXLImporter NotesDxlImporter { get; set; }
+
+        public DonloadOnCreateDxlFile()
+        {
+            Dispose();
+        }
+
         /// <summary>
         /// Загрузка файла
         /// </summary>
@@ -17,40 +26,36 @@ namespace LotusLibrary.DxlLotus.DocumentGeneration
         /// <param name="db">БД</param>
         public string ImportDxlFile(string fileName, NotesDatabase db)
         {
-            NotesStream notesStream = null;
-            NotesDXLImporter notesDXLImporter = null;
-            notesStream = db.Parent.CreateStream();
-            notesDXLImporter = db.Parent.CreateDXLImporter();
-            if (!notesStream.Open(fileName))
+            NotesStream = db.Parent.CreateStream();
+            NotesDxlImporter = db.Parent.CreateDXLImporter();
+            if (!NotesStream.Open(fileName))
             {
                 Loggers.Log4NetLogger.Error(new Exception("Невозможно открыть файл " + fileName));
                 return null;
             }
-            notesDXLImporter.ACLImportOption = DXLIMPORTOPTION.DXLIMPORTOPTION_UPDATE_ELSE_IGNORE;
-            notesDXLImporter.DesignImportOption = DXLIMPORTOPTION.DXLIMPORTOPTION_REPLACE_ELSE_CREATE;
-            notesDXLImporter.ReplicaRequiredForReplaceOrUpdate = false;
-            notesDXLImporter.DocumentImportOption = DXLIMPORTOPTION.DXLIMPORTOPTION_UPDATE_ELSE_CREATE;
-            notesDXLImporter.ExitOnFirstFatalError = true;
+            //notesDXLImporter.InputValidationOption = VALIDATIONOPTION.VALIDATE_NEVER;
+            NotesDxlImporter.ACLImportOption = DXLIMPORTOPTION.DXLIMPORTOPTION_UPDATE_ELSE_IGNORE;
+            NotesDxlImporter.DesignImportOption = DXLIMPORTOPTION.DXLIMPORTOPTION_REPLACE_ELSE_CREATE;
+            NotesDxlImporter.ReplicaRequiredForReplaceOrUpdate = false;
+            NotesDxlImporter.DocumentImportOption = DXLIMPORTOPTION.DXLIMPORTOPTION_UPDATE_ELSE_CREATE;
+            NotesDxlImporter.ExitOnFirstFatalError = true;
             try
             {
-                notesDXLImporter.Import(notesStream, db);
-                string text = notesDXLImporter.GetFirstImportedNoteId();
-                notesStream.Truncate();
-                notesStream.Close();
+                NotesDxlImporter.Import(NotesStream, db);
+                string text = NotesDxlImporter.GetFirstImportedNoteId();
+                NotesStream.Truncate();
+                NotesStream.Close();
                 return text;
             }
             catch (Exception e)
             {
-                Loggers.Log4NetLogger.Error(new Exception(notesDXLImporter.Log));
-                Loggers.Log4NetLogger.Error(new Exception(notesDXLImporter.LogComment));
+                Loggers.Log4NetLogger.Error(new Exception(NotesDxlImporter.Log));
+                Loggers.Log4NetLogger.Error(new Exception(NotesDxlImporter.LogComment));
                 Loggers.Log4NetLogger.Error(e);
             }
             finally
             {
-                if (notesDXLImporter != null)
-                    Marshal.ReleaseComObject(notesDXLImporter);
-                if (notesStream != null)
-                    Marshal.ReleaseComObject(notesStream);
+                Dispose();
             }
             return null;
         }
@@ -91,6 +96,17 @@ namespace LotusLibrary.DxlLotus.DocumentGeneration
                 }
             }
         }
-
+        /// <summary>
+        /// Освобождение ресурсов памяти
+        /// </summary>
+        public void Dispose()
+        {
+            if (NotesStream != null)
+                Marshal.ReleaseComObject(NotesStream);
+            NotesStream = null;
+            if (NotesDxlImporter != null)
+                Marshal.ReleaseComObject(NotesDxlImporter);
+            NotesDxlImporter = null;
+        }
     }
 }

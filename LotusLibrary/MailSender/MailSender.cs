@@ -1,7 +1,4 @@
 ﻿using System;
-using System.IO;
-using System.Runtime.InteropServices;
-using Domino;
 using EfDatabase.Inventory.Base;
 using LotusLibrary.DbConnected;
 using LotusLibrary.DxlLotus;
@@ -17,8 +14,8 @@ namespace LotusLibrary.MailSender
 
         public MailSender()
         {
+            
             Dispose();
-            Db?.Dispose();
             Config = new LotusConfig();
             Db = new LotusConnectedDataBase(Config.LotusIdFilePassword);
 
@@ -85,12 +82,11 @@ namespace LotusLibrary.MailSender
             var noteId = download.ImportDxlFile(Config.PathGenerateScheme, Db.Db);
             var docSave = Db.Db.GetDocumentByID(noteId);
             docSave.Send(false);
-            Db.Dispose();
         }
 
         public void Dispose()
         {
-
+            Db?.Dispose();
             Config = null;
             Db = null;
         }
