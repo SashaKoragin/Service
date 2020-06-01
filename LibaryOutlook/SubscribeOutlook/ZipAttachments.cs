@@ -1,8 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using Ionic.Zip;
-using OpenPop.Mime;
+using MimeKit;
+using MessagePart = MimeKit.MessagePart;
 
 namespace LibraryOutlook.SubscribeOutlook
 {
@@ -11,21 +14,70 @@ namespace LibraryOutlook.SubscribeOutlook
         /// <summary>
         /// Архивирование модели POP3 Файлов
         /// </summary>
-        /// <param name="collectionMessageAttach"></param>
-        public byte[] StartZipArchive(List<MessagePart> collectionMessageAttach,string nameZip)
+        /// <param name="collectionMessageAttach">Коллекция пришедшей почты по POP3</param>
+        /// <param name="fullPathZip">Полный путь к наименованию Архива файла</param>
+        public byte[] StartZipArchive(IEnumerable<MimeEntity> collectionMessageAttach,string fullPathZip)
         {
-            if (collectionMessageAttach.Count > 0)
+            var messageAttaches = collectionMessageAttach as MimeEntity[] ?? collectionMessageAttach.ToArray();
+            if (messageAttaches.Any())
             {
-                using (var zip = File.Open(nameZip, FileMode.OpenOrCreate, FileAccess.ReadWrite))
+                using (var zip = File.Open(fullPathZip, FileMode.OpenOrCreate, FileAccess.ReadWrite))
                 {
                     using (var zipToWrite = new ZipOutputStream(zip))
                     {
                         var i = 0;
-                        foreach (var messageAttach in collectionMessageAttach)
+                        foreach (var messageAttach in messageAttaches)
                         {
-                            var fileStream = messageAttach.Body;
-                            var nameFile = $"{i}_{messageAttach.FileName}";
-                            using (Stream newFileStream =new MemoryStream(fileStream))
+                          var nameFile = $"{i}_{messageAttach.ContentDisposition?.FileName}";
+                          using (var memory = new MemoryStream())
+                          {
+                              if (messageAttach is MimePart)
+                                  ((MimePart)messageAttach).Content.DecodeTo(memory);
+                              else
+                                  ((MessagePart)messageAttach).Message.WriteTo(memory);
+                              var bytes = memory.ToArray();
+                              using (Stream newFileStream = new MemoryStream(bytes))
+                              {
+                                  var byteBuffer = new byte[newFileStream.Length - 1];
+                                  newFileStream.Read(byteBuffer, 0, byteBuffer.Length);
+                                  zipToWrite.EnableZip64 = Zip64Option.Never;
+                                  zipToWrite.AlternateEncodingUsage = ZipOption.Always;
+                                  zipToWrite.AlternateEncoding = Encoding.GetEncoding(866);
+                                  zipToWrite.PutNextEntry(nameFile);
+                                  zipToWrite.Write(byteBuffer, 0, byteBuffer.Length);
+                              }
+                          }
+                        
+                          i++;
+                        }
+                    }
+                    zip.Close();
+                }
+                return File.ReadAllBytes(fullPathZip);
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Генерация zip архива для отправки по SMTP
+        /// </summary>
+        /// <param name="collectionNameFile">Массив имен файлов</param>
+        /// <param name="fullPathZip">Полный путь к наименованию Архива файла</param>
+        /// <returns>Полный путь к архиву</returns>
+        public byte[] StartZipArchiveOut(string[] collectionNameFile, string fullPathZip)
+        {
+            if (collectionNameFile.Length > 0)
+            {
+                using (var zip = File.Open(fullPathZip, FileMode.OpenOrCreate, FileAccess.ReadWrite))
+                {
+                    using (var zipToWrite = new ZipOutputStream(zip))
+                    {
+                        var i = 0;
+                        foreach (var fullNameFile in collectionNameFile)
+                        {
+                            var fileStream = File.ReadAllBytes(fullNameFile);
+                            var nameFile = $"{i}_{Path.GetFileName(fullNameFile)}";
+                            using (Stream newFileStream = new MemoryStream(fileStream))
                             {
                                 var byteBuffer = new byte[newFileStream.Length - 1];
                                 newFileStream.Read(byteBuffer, 0, byteBuffer.Length);
@@ -40,9 +92,21 @@ namespace LibraryOutlook.SubscribeOutlook
                     }
                     zip.Close();
                 }
-                return File.ReadAllBytes(nameZip);
+                return File.ReadAllBytes(fullPathZip);
             }
             return null;
+        }
+        /// <summary>
+        /// Удаление всех файлов в папке 
+        /// </summary>
+        /// <param name="path">Путь к папке для удаления</param>
+        public void DropAllFileToPath(string path)
+        {
+            foreach (FileInfo file in new DirectoryInfo(path).GetFiles())
+            {
+                Loggers.Log4NetLogger.Info(new Exception($"Наименование удаленных файлов: {file.FullName}"));
+                file.Delete();
+            }
         }
     }
 }

@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Runtime.InteropServices;
+using Domino;
 using EfDatabase.Inventory.Base;
 using LotusLibrary.DbConnected;
 using LotusLibrary.DxlLotus;
@@ -8,7 +11,16 @@ using LotusLibrary.DxlLotus.DocumentGeneration;
 namespace LotusLibrary.MailSender
 {
    public class MailSender : IDisposable
-    { 
+    {
+        /// <summary>
+        /// View
+        /// </summary>
+        public NotesView NotesView { get; set; }
+        /// <summary>
+        /// Document
+        /// </summary>
+        public NotesDocument Document { get; set; }
+
         private LotusConfig Config { get; set; }
         private LotusConnectedDataBase Db { get; set; }
 
@@ -72,7 +84,7 @@ namespace LotusLibrary.MailSender
         /// </summary>
         /// <param name="mailOutlook">Письма заступившие</param>
         /// <param name="arrayUsers">Рассылка пользователям</param>
-        public void SendMail(MailOutlook mailOutlook,string[] arrayUsers)
+        public void SendMailIn(MailLotusOutlookIn mailOutlook,string[] arrayUsers)
         {
             Db.LotusConnectedDataBaseServer(Config.LotusServer, Config.LotusMailSend);
             DocumentGenerationAllDxl document = new DocumentGenerationAllDxl(Db.Db);
@@ -80,15 +92,121 @@ namespace LotusLibrary.MailSender
             DonloadOnCreateDxlFile download = new DonloadOnCreateDxlFile();
             download.DxlFileSave(Config.PathGenerateScheme, document.Document, typeof(note));
             var noteId = download.ImportDxlFile(Config.PathGenerateScheme, Db.Db);
-            var docSave = Db.Db.GetDocumentByID(noteId);
-            docSave.Send(false);
+            if (noteId != null)
+            {
+                var docSave = Db.Db.GetDocumentByID(noteId);
+                docSave.Send(false);
+            }
+        }
+        /// <summary>
+        /// Генерация производного документа ответа БД должна быть открыта
+        /// </summary>
+        /// <param name="arrayUsers">Кому отправлять</param>
+        /// <param name="subject">Тема</param>
+        /// <param name="body">Тело документа</param>
+        /// <param name="fileFullPathName">Имя файла</param>
+        public void SendMailAutoOutput(string[] arrayUsers, string subject, string body, string fileFullPathName = null)
+        {
+            if (Db.Db != null)
+            {
+                DocumentGenerationAllDxl document = new DocumentGenerationAllDxl(Db.Db);
+                document.DocumentGenerationMailMemo(arrayUsers, subject, Db.Session.UserName, body, fileFullPathName);
+                DonloadOnCreateDxlFile download = new DonloadOnCreateDxlFile();
+                download.DxlFileSave(Config.PathGenerateScheme, document.Document, typeof(note));
+                var noteId = download.ImportDxlFile(Config.PathGenerateScheme, Db.Db);
+                if (noteId != null)
+                {
+                    var docSave = Db.Db.GetDocumentByID(noteId);
+                    docSave.Send(false);
+                }
+                Loggers.Log4NetLogger.Info(new Exception($"Почта не прошла имеются ошибки!!!"));
+            }
+            else
+            {
+                Loggers.Log4NetLogger.Error(new Exception($"База не открыта или пуста для обратной связи ошибки"));
+            }
+        }
+        /// <summary>
+        /// Формирование модели для отправки по SMTP протоколу
+        /// </summary>
+        /// <param name="pathSaveFile">Путь сохранения вложенных в письма файлов на отправку</param>
+        public List<MailLotusOutlookOut> SendMailOut(string pathSaveFile)
+        {
+            var mailLotusOutlookOut = new List<MailLotusOutlookOut>();
+            var publicFunction = new PublicFunctionInfo.PublicFunctionInfo();
+            Db.LotusConnectedDataBaseServer(Config.LotusServer, Config.LotusMailSend);
+            if (Db.Db == null)
+                throw new InvalidOperationException("Фатальная ошибка нет соединения с сервером!");
+            var docList = new List<string>();
+            try
+            {
+                NotesView = Db.GetViewLotus("$Inbox");
+                Document = NotesView.GetFirstDocument();
+                while (Document != null)
+                {
+                    var mail = new MailLotusOutlookOut
+                    {
+                        IdMail = Document.UniversalID,
+                        MailAdressOut = Document.GetItemValue("Subject")[0].ToString(),
+                        Body = Document.GetItemValue("Body")[0].ToString()
+                    };
+                    NotesRichTextItem bodyFileExtractMail = Document.GetFirstItem("Body") as NotesRichTextItem;
+                    var nameFileList = publicFunction.ExtractFile(bodyFileExtractMail, pathSaveFile);
+                    mail.FullPathListFile = nameFileList != null && nameFileList.Count > 0 ? string.Join(";", nameFileList) : null;
+                    mail.MailAdressIn = Document.GetItemValue("From")[0].ToString();
+                    docList.Add(Document.UniversalID);
+                    mailLotusOutlookOut.Add(mail);
+                    Document = NotesView.GetNextDocument(Document);
+                }
+            }
+            catch (Exception ex)
+            {
+                Loggers.Log4NetLogger.Error(ex);
+                throw;
+            }
+            finally
+            {
+                if (Document != null)
+                    Marshal.ReleaseComObject(Document);
+                Document = null;
+                if (NotesView != null)
+                    Marshal.ReleaseComObject(NotesView);
+                NotesView = null;
+            }
+            foreach (var unId in docList)
+            {
+                Document = Db.Db.GetDocumentByUNID(unId);
+                if (Document == null)
+                    throw new InvalidOperationException($"No document {unId}");
+                Document.Remove(true);
+                Marshal.ReleaseComObject(Document);
+            }
+            return mailLotusOutlookOut;
+        }
+
+        private void ReleaseUnmanagedResources()
+        {
+
+        }
+
+        private void Dispose(bool disposing)
+        {
+            ReleaseUnmanagedResources();
+            if (disposing)
+            {
+                Db?.Dispose();
+            }
         }
 
         public void Dispose()
         {
-            Db?.Dispose();
-            Config = null;
-            Db = null;
+            Dispose(true);
+          //  GC.SuppressFinalize(this);
+        }
+
+        ~MailSender()
+        {
+            Dispose(false);
         }
     }
 }

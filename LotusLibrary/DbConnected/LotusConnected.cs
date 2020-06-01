@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Domino;
 
@@ -13,7 +12,6 @@ namespace LotusLibrary.DbConnected
         /// Инициализация Пароль
         /// </summary>
         /// <param name="password">Пароль</param>
-
         public LotusConnectedDataBase(string password)
         {
             Dispose();
@@ -43,6 +41,8 @@ namespace LotusLibrary.DbConnected
             {
                 Loggers.Log4NetLogger.Info(new Exception($"Пользователь {Session.UserName}"));
                 Db = Session.GetDatabase(server, database, isCreateDb);
+                if (Db == null)
+                    throw new InvalidOperationException("Фатальная ошибка нет соединения с сервером!");
                 if (Db.IsOpen)
                 {
                     Loggers.Log4NetLogger.Info(new Exception($"База данных {Db.FileName} открыта!"));
@@ -53,9 +53,20 @@ namespace LotusLibrary.DbConnected
             }
             catch(Exception ex)
             {
+                Db = null;
+                Loggers.Log4NetLogger.Error(new Exception($"Соединение с базой данных {database} не возможно!"));
                 Loggers.Log4NetLogger.Error(ex);
             }
             return null;
+        }
+        /// <summary>
+        /// Получение представления по имени
+        /// </summary>
+        /// <param name="nameView">Наименование представления</param>
+        /// <returns></returns>
+        public NotesView GetViewLotus(string nameView)
+        {
+            return Db.GetView(nameView);
         }
 
         /// <summary>
@@ -84,14 +95,33 @@ namespace LotusLibrary.DbConnected
             return dbDatabase;
         }
 
-        public void Dispose()
+        private void ReleaseUnmanagedResources()
         {
             if (Db != null)
                 Marshal.ReleaseComObject(Db);
             Db = null;
-            if (Session!= null)
+            if (Session != null)
                 Marshal.ReleaseComObject(Session);
             Session = null;
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            ReleaseUnmanagedResources();
+            if (disposing)
+            {
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+           // GC.SuppressFinalize(this);
+        }
+
+        ~LotusConnectedDataBase()
+        {
+            Dispose(false);
         }
     }
 }

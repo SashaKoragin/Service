@@ -10,5 +10,6 @@ namespace LotusLibrary.Mime
             [Description("application/zip")]
             Zip
         }
+
     }
 }

@@ -1,14 +1,11 @@
-﻿using LibraryOutlook.SubscribeOutlook;
-using System.IO;
-using System.Text.RegularExpressions;
+﻿using System.IO;
 using Domino;
+using LibraryOutlook.SubscribeOutlook;
 using LotusLibrary.DbConnected;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using LotusLibrary.MailSender;
-using EfDatabase.Inventory.BaseLogic.Select;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-
-namespace LibraryOutlook.SubscribeOutlook.Tests
+namespace LibraryOutlookTests.SubscribeOutlook
 {
     [TestClass()]
     public class OutlookAutoTests
@@ -16,14 +13,14 @@ namespace LibraryOutlook.SubscribeOutlook.Tests
         [TestMethod()]
         public void StartMessageTest()
         {
-            OutlookAuto outlook = new OutlookAuto();
-            outlook.StartMessageOit(new ConfigFile.ConfigFile());
+            OutlookAutoPop3 outlook = new OutlookAutoPop3();
+            outlook.StartMessageOit(new LibraryOutlook.ConfigFile.ConfigFile());
         }
         [TestMethod()]
         public void TestLotusServer()
         {
             MailSender mail = new MailSender();
-            mail.SendMail(null, null);
+            mail.SendMailIn(null, null);
         }
 
         [TestMethod()]
@@ -57,25 +54,15 @@ namespace LibraryOutlook.SubscribeOutlook.Tests
         [TestMethod()]
         public void StartMessageTest1()
         {
-            ConfigFile.ConfigFile Parameters = new ConfigFile.ConfigFile();
-            OutlookAuto t = new OutlookAuto();
+            LibraryOutlook.ConfigFile.ConfigFile Parameters = new LibraryOutlook.ConfigFile.ConfigFile();
+            OutlookAutoPop3 t = new OutlookAutoPop3();
             t.StartMessageOit(Parameters);
         }
         [TestMethod()]
         public void FindUserLotus()
         {
-
-          //  var Session = new NotesSession();
-          ////  Session.Initialize("Password");
-
-          //  Session.Initialize("12345");
-          
-          //  var registration = Session.CreateRegistration();
-          //  registration.SwitchToID(@"C:\Program Files (x86)\lotus\notes\data\7751OI.id","Password");
-              OutlookAuto auto = new OutlookAuto();
-              var parameters = new ConfigFile.ConfigFile();
-            ////  auto.StartMessageOit(parameters);
-              auto.StartMessageR7751(parameters);
+            var smtp = new OutlookAutoSmtp();
+            smtp.SendSmtpMessage(new LibraryOutlook.ConfigFile.ConfigFile());
         }
     }
 }

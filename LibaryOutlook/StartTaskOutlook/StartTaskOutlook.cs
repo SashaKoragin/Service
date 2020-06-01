@@ -6,7 +6,9 @@ namespace LibraryOutlook.StartTaskOutlook
 {
    public class StartTaskOutlook : IDisposable
     {
-        private OutlookAuto OutlookAuto { get; set; }
+        private OutlookAutoPop3 OutlookAutoPop3 { get; set; }
+
+        private OutlookAutoSmtp OutlookAutoSmtp { get; set; }
 
         private readonly ConfigFile.ConfigFile parameters = new ConfigFile.ConfigFile();
 
@@ -17,7 +19,8 @@ namespace LibraryOutlook.StartTaskOutlook
         /// </summary>
         public StartTaskOutlook()
         {
-            OutlookAuto = new OutlookAuto();
+            OutlookAutoPop3 = new OutlookAutoPop3();
+            OutlookAutoSmtp = new OutlookAutoSmtp();
             timerMessage.Interval = Convert.ToInt32(parameters.Interval);
             timerMessage.Enabled = true;
             timerMessage.AutoReset = true;
@@ -32,15 +35,17 @@ namespace LibraryOutlook.StartTaskOutlook
         /// <param name="e"></param>
         private void TimerMessage_Tick(object sender, EventArgs e)
         {
-            OutlookAuto.StartMessageOit(parameters);
-            OutlookAuto.StartMessageR7751(parameters);
+            OutlookAutoPop3.StartMessageOit(parameters);
+            OutlookAutoPop3.StartMessageR7751(parameters);
+            OutlookAutoSmtp.SendSmtpMessage(parameters);
         }
         /// <summary>
         /// Освобождение памяти
         /// </summary>
         public void Dispose()
         {
-            OutlookAuto = null;
+            OutlookAutoPop3 = null;
+            OutlookAutoSmtp = null;
             timerMessage.Dispose();
         }
     }

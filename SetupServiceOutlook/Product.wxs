@@ -119,8 +119,14 @@
       <Component Id="DotNetZip.dll" Guid="5987C217-F669-458C-98A0-9036FBC80DB8">
         <File Id="DotNetZip.dll" Name="DotNetZip.dll" Source="$(var.ServiceOutlook.TargetDir)DotNetZip.dll"/>
       </Component>
-      <Component Id="OpenPop.dll" Guid="90E4F4C0-F564-4311-B6C4-47DF9B31394D">
-        <File Id="OpenPop.dll" Name="OpenPop.dll" Source="$(var.ServiceOutlook.TargetDir)OpenPop.dll"/>
+      <Component Id="BouncyCastle.Crypto.dll" Guid="37AEA70F-25D4-4391-A5EE-DF3814020E54">
+        <File Id="BouncyCastle.Crypto.dll" Name="BouncyCastle.Crypto.dll" Source="$(var.ServiceOutlook.TargetDir)BouncyCastle.Crypto.dll"/>
+      </Component>
+      <Component Id="MailKit.dll" Guid="32065E43-9456-43D5-8B53-6458EA064B7A">
+        <File Id="MailKit.dll" Name="MailKit.dll" Source="$(var.ServiceOutlook.TargetDir)MailKit.dll"/>
+      </Component>
+      <Component Id="MimeKit.dll" Guid="8E31A05E-6826-4837-9A5D-9EEA63D6C430">
+        <File Id="MimeKit.dll" Name="MimeKit.dll" Source="$(var.ServiceOutlook.TargetDir)MimeKit.dll"/>
       </Component>
 		</ComponentGroup>
 	</Fragment>
