@@ -77,7 +77,7 @@ namespace LibraryOutlookTests.SubscribeOutlook
             var session = new NotesSession();
             session.Initialize("12345");
             var HtmlBody = session.CreateStream();
-            var path = @"D:\16.03.2020_09.35.31_e.safonov.r7700.zip";
+            var path = @"D:\Вложение 10.zip";
             var mailBody = @"<div><br/>
                                </div><div>
                     <br/>
@@ -118,7 +118,7 @@ namespace LibraryOutlookTests.SubscribeOutlook
             MimeHeader.SetHeaderVal("1.0");
 
             MimeHeader = MIMEEntity.CreateHeader("Content-Type");
-            MimeHeader.SetHeaderValAndParams("multipart/alternative;boundary=\"=NextPart_=\"");
+            MimeHeader.SetHeaderValAndParams("multipart/mixed");
 
             var MimeChilds = MIMEEntity.CreateChildEntity();
             HtmlBody.WriteText(mailBody);
@@ -127,13 +127,17 @@ namespace LibraryOutlookTests.SubscribeOutlook
             MimeChilds = MIMEEntity.CreateChildEntity();
 
 
-
+            
             HtmlBody = session.CreateStream();
             HtmlBody.Open(path, "");
             MimeHeader = MimeChilds.CreateHeader("Content-Disposition");
+
             MimeHeader.SetHeaderVal("attachment; filename=\"16.03.2020_09.35.31_e.safonov.r7700.zip\"");
-            MimeChilds.SetContentFromBytes(HtmlBody, "application/zip; name=\"16.03.2020_09.35.31_e.safonov.r7700.zip\"", Domino.MIME_ENCODING.ENC_NONE);
+            MimeChilds.SetContentFromBytes(HtmlBody, "application/zip; name=\"16.03.2020_09.35.31_e.safonov.r7700.zip\"", Domino.MIME_ENCODING.ENC_IDENTITY_BINARY);
+           
+          
             document.CloseMIMEEntities(true);
+            
             session.ConvertMime = true;
             document.CloseMIMEEntities(true);
             if (document.ComputeWithForm(true, false))

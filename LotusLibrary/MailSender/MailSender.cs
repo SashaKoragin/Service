@@ -129,7 +129,7 @@ namespace LotusLibrary.MailSender
                 mimeHeader.SetHeaderVal("1.0");
 
                 mimeHeader = mimeEntity.CreateHeader("Content-Type");
-                mimeHeader.SetHeaderValAndParams("multipart/alternative;boundary=\"=NextPart_=\"");
+                mimeHeader.SetHeaderValAndParams("multipart/mixed");
 
                 var mimeChild = mimeEntity.CreateChildEntity();
                 NotesStream.WriteText(mailOutlook.Body);
@@ -143,7 +143,7 @@ namespace LotusLibrary.MailSender
                     NotesStream.Open(mailOutlook.FullPathFile);
                     mimeHeader = mimeChild.CreateHeader("Content-Disposition");
                     mimeHeader.SetHeaderVal($"attachment; filename=\"{mailOutlook.NameFile}\"");
-                    mimeChild.SetContentFromBytes(NotesStream, $"application/zip; name=\"{mailOutlook.NameFile}\"", MIME_ENCODING.ENC_NONE);
+                    mimeChild.SetContentFromBytes(NotesStream, $"application/zip; name=\"{mailOutlook.NameFile}\"", MIME_ENCODING.ENC_IDENTITY_BINARY);
                 }
                 Document.CloseMIMEEntities(true);
                 Db.Db.Parent.ConvertMime = true;
