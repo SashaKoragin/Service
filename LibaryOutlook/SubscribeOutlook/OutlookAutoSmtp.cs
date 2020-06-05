@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 using EfDatabase.Inventory.MailLogicLotus;
 using LotusLibrary.MailSender;
@@ -39,36 +40,43 @@ namespace LibraryOutlook.SubscribeOutlook
                         mailLotusOutlookOut.NameFileZip = nameFile;
                     }
                     //Проверка почты
-                    if (!IsValid(mailLotusOutlookOut.MailAdressOut))
+                    var user = new[] { mailLotusOutlookOut.MailAdressIn };
+                    var arrayMail = MailArraySubject(mailLotusOutlookOut.MailAdressOut);
+                    if (arrayMail.Length > 0)
                     {
-                        var user = new[] {mailLotusOutlookOut.MailAdressIn};
-                        Mail.SendMailAutoOutput(user, $"Ошибка отправки письма на адрес {mailLotusOutlookOut.MailAdressOut} !!!", $"Ошибка почты {mailLotusOutlookOut.MailAdressOut} !!!");
-                        mailLotusOutlookOut.ErrorMail = $"Почтовый ящик не прошел проверку отправка не возможна!";
+                        mailLotusOutlookOut.ErrorMail = $"Письмо отправлено адресатам {string.Join("/", arrayMail)}";
+                        foreach (var mail in arrayMail)
+                        {
+                            MimeMessage mailToClient = new MimeMessage();
+                            mailToClient.To.Add(new MailboxAddress(mail));
+                            mailToClient.Subject = string.IsNullOrWhiteSpace(mailLotusOutlookOut.SubjectMail) ? "" : mailLotusOutlookOut.SubjectMail;
+                            mailToClient.From.Add(new MailboxAddress(mailLotusOutlookOut.MailAdressIn, parameters.LoginR7751));
+                            mailToClient.Body = builder.ToMessageBody();
+                            try
+                            {
+                                using (var smtp = new MailKit.Net.Smtp.SmtpClient())
+                                {
+                                    smtp.CheckCertificateRevocation = false;
+                                    smtp.Connect(parameters.Pop3Address, 465, true);
+                                    smtp.Authenticate(parameters.LoginR7751, parameters.PasswordR7751);
+                                    smtp.Send(mailToClient);
+                                    smtp.Disconnect(true);
+                                }
+                                Loggers.Log4NetLogger.Info(new Exception($"Отправка письма {mailLotusOutlookOut.IdMail} на адрес {mail}"));
+                            }
+                            catch (Exception ex)
+                            {
+                                Loggers.Log4NetLogger.Error(ex);
+                                mailLotusOutlookOut.ErrorMail = $"Письмо не отправлено адресату возникли ошибки во время отправки";
+                            }
+                        }
+                        Mail.SendMailAutoOutput(user, $"Отправка писем произведена!!!", $"Адреса участники рассылки \r\n {string.Join("\r\n", arrayMail)}");
                     }
                     else
                     {
-                        MimeMessage mailToClient = new MimeMessage();
-                        mailToClient.To.Add(new MailboxAddress(mailLotusOutlookOut.MailAdressOut));
-                        mailToClient.Subject = string.IsNullOrWhiteSpace(mailLotusOutlookOut.SubjectMail) ? "" : mailLotusOutlookOut.SubjectMail;
-                        mailToClient.From.Add(new MailboxAddress(mailLotusOutlookOut.MailAdressIn, parameters.LoginR7751));
-                        mailToClient.Body = builder.ToMessageBody();
-                        try
-                        {
-                            using (var smtp = new MailKit.Net.Smtp.SmtpClient())
-                            {
-                                smtp.CheckCertificateRevocation = false;
-                                smtp.Connect(parameters.Pop3Address, 465, true);
-                                smtp.Authenticate(parameters.LoginR7751, parameters.PasswordR7751);
-                                smtp.Send(mailToClient);
-                                smtp.Disconnect(true);
-                                mailLotusOutlookOut.ErrorMail = $"Письмо отправлено адресату {mailLotusOutlookOut.MailAdressOut}";
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            Loggers.Log4NetLogger.Error(ex);
-                            mailLotusOutlookOut.ErrorMail = $"Письмо не отправлено адресату возникли ошибки во время отправки";
-                        }
+                        Mail.SendMailAutoOutput(user, $"Отправка писем на адрес(а) не возможна {mailLotusOutlookOut.MailAdressOut} !!!", $"Ошибка почты {mailLotusOutlookOut.MailAdressOut} !!!");
+                        mailLotusOutlookOut.ErrorMail = $"Почтовый ящик(и) не прошел(и) проверку отправка не возможна!";
+                        Loggers.Log4NetLogger.Error(new Exception($"Отправка письма {mailLotusOutlookOut.IdMail} не прошла проверку внешних адресов"));
                     }
                     mailSave.AddModelMailOut(mailLotusOutlookOut);
                 }
@@ -86,15 +94,14 @@ namespace LibraryOutlook.SubscribeOutlook
                 Mail.Dispose();
             }
         }
-
         /// <summary>
-        /// Проверка Valid mail User Send
+        /// Поиск всех Email Адресов
         /// </summary>
-        /// <param name="emailAddress">Проверка адреса почты</param>
+        /// <param name="emailAddress">Тема описание из Lotus</param>
         /// <returns></returns>
-        private bool IsValid(string emailAddress)
+        private string[] MailArraySubject(string emailAddress)
         {
-            return Regex.IsMatch(emailAddress, @"^([\w-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$");
+            return Regex.Matches(emailAddress, @"([\w-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)").Cast<Match>().Select(m => m.Value).ToArray();
         }
    }
 }

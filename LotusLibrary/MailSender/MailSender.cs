@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Runtime.InteropServices;
 using Domino;
 using EfDatabase.Inventory.Base;
@@ -20,7 +21,10 @@ namespace LotusLibrary.MailSender
         /// Document
         /// </summary>
         public NotesDocument Document { get; set; }
-
+        /// <summary>
+        /// Поток Lotus
+        /// </summary>
+        public NotesStream NotesStream { get; set; }
         private LotusConfig Config { get; set; }
         private LotusConnectedDataBase Db { get; set; }
 
@@ -99,6 +103,75 @@ namespace LotusLibrary.MailSender
             }
         }
         /// <summary>
+        /// Рассылка писем если пришло Html В случае если зашло Html
+        /// </summary>
+        /// <param name="mailOutlook">Письма заступившие</param>
+        /// <param name="arrayUsers">Рассылка пользователям</param>
+        public void SendMailMimeHtml(MailLotusOutlookIn mailOutlook, string[] arrayUsers)
+        {
+            Db.LotusConnectedDataBaseServer(Config.LotusServer, Config.LotusMailSend);
+            NotesStream = Db.Db.Parent.CreateStream();
+            Document = Db.Db.CreateDocument();
+            try
+            {
+                if (Db.Db == null)
+                    throw new InvalidOperationException("Фатальная ошибка нет соединения с сервером!");
+                Document.AppendItemValue("Subject", "От кого: " + mailOutlook.MailAdress + " Тема: " + mailOutlook.SubjectMail);
+                Document.AppendItemValue("Recipients", Db.Session.UserName);
+                Document.AppendItemValue("OriginalTo", Db.Session.UserName);
+                Document.AppendItemValue("From", Db.Session.UserName);
+                Document.AppendItemValue("OriginalFrom", Db.Session.UserName);
+                Document.AppendItemValue("SendTo", arrayUsers);
+
+                var mimeEntity = Document.CreateMIMEEntity();
+
+                var mimeHeader = mimeEntity.CreateHeader("MIME-Version");
+                mimeHeader.SetHeaderVal("1.0");
+
+                mimeHeader = mimeEntity.CreateHeader("Content-Type");
+                mimeHeader.SetHeaderValAndParams("multipart/alternative;boundary=\"=NextPart_=\"");
+
+                var mimeChild = mimeEntity.CreateChildEntity();
+                NotesStream.WriteText(mailOutlook.Body);
+
+                mimeChild.SetContentFromText(NotesStream, "text/html;charset=\"utf-8\"", MIME_ENCODING.ENC_NONE);
+                mimeChild = mimeEntity.CreateChildEntity();
+
+                if (File.Exists(mailOutlook.FullPathFile))
+                {
+                    NotesStream.Truncate();
+                    NotesStream.Open(mailOutlook.FullPathFile);
+                    mimeHeader = mimeChild.CreateHeader("Content-Disposition");
+                    mimeHeader.SetHeaderVal($"attachment; filename=\"{mailOutlook.NameFile}\"");
+                    mimeChild.SetContentFromBytes(NotesStream, $"application/zip; name=\"{mailOutlook.NameFile}\"", MIME_ENCODING.ENC_NONE);
+                }
+                Document.CloseMIMEEntities(true);
+                Db.Db.Parent.ConvertMime = true;
+                if (Document.ComputeWithForm(true, false))
+                {
+                    Document.Save(true, true);
+                    Document.Send(false);
+                    NotesStream.Truncate();
+                    NotesStream.Close();
+                }
+            }
+            catch (Exception e)
+            {
+                Loggers.Log4NetLogger.Error(new Exception("В рассылке Html письма возникла ошибка!"));
+                Loggers.Log4NetLogger.Error(e);
+            }
+            finally
+            {
+                if (Document != null)
+                    Marshal.ReleaseComObject(Document);
+                Document = null;
+                if (NotesStream != null)
+                    Marshal.ReleaseComObject(NotesStream);
+                NotesStream = null;
+            }
+        }
+
+        /// <summary>
         /// Генерация производного документа ответа БД должна быть открыта
         /// </summary>
         /// <param name="arrayUsers">Кому отправлять</param>
@@ -119,7 +192,6 @@ namespace LotusLibrary.MailSender
                     var docSave = Db.Db.GetDocumentByID(noteId);
                     docSave.Send(false);
                 }
-                Loggers.Log4NetLogger.Info(new Exception($"Почта не прошла имеются ошибки!!!"));
             }
             else
             {

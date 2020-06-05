@@ -16,17 +16,16 @@ namespace LibraryOutlook.SubscribeOutlook
         /// </summary>
         /// <param name="collectionMessageAttach">Коллекция пришедшей почты по POP3</param>
         /// <param name="fullPathZip">Полный путь к наименованию Архива файла</param>
-        public byte[] StartZipArchive(IEnumerable<MimeEntity> collectionMessageAttach,string fullPathZip)
+        public byte[] StartZipArchive(List<MimeEntity> collectionMessageAttach,string fullPathZip)
         {
-            var messageAttaches = collectionMessageAttach as MimeEntity[] ?? collectionMessageAttach.ToArray();
-            if (messageAttaches.Any())
+            if (collectionMessageAttach.Any())
             {
                 using (var zip = File.Open(fullPathZip, FileMode.OpenOrCreate, FileAccess.ReadWrite))
                 {
                     using (var zipToWrite = new ZipOutputStream(zip))
                     {
                         var i = 0;
-                        foreach (var messageAttach in messageAttaches)
+                        foreach (var messageAttach in collectionMessageAttach)
                         {
                           var nameFile = $"{i}_{messageAttach.ContentDisposition?.FileName}";
                           using (var memory = new MemoryStream())

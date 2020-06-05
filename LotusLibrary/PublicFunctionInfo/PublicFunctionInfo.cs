@@ -30,24 +30,21 @@ namespace LotusLibrary.PublicFunctionInfo
         {
             if (notesRich != null)
             {
-                if (!string.IsNullOrWhiteSpace(notesRich.Values))
+                if (notesRich.type == IT_TYPE.RICHTEXT)
                 {
-                    if (notesRich.type == IT_TYPE.RICHTEXT)
+                    List<string> listFullPath = new List<string>();
+                    if (notesRich.EmbeddedObjects != null)
                     {
-                        List<string> listFullPath = new List<string>();
-                        if (notesRich.EmbeddedObjects != null)
+                        foreach (var embedded in notesRich.EmbeddedObjects)
                         {
-                            foreach (var embedded in notesRich.EmbeddedObjects)
+                            if (embedded.Type == 1454)
                             {
-                                if (embedded.Type == 1454)
-                                {
-                                    var fileName = path + embedded.Name;
-                                    embedded.ExtractFile(fileName);
-                                    listFullPath.Add(fileName);
-                                }
+                                var fileName = path + embedded.Name;
+                                embedded.ExtractFile(fileName);
+                                listFullPath.Add(fileName);
                             }
-                            return listFullPath;
                         }
+                        return listFullPath;
                     }
                 }
             }

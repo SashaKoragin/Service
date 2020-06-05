@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using EfDatabase.Inventory.Base;
 using EfDatabase.Inventory.BaseLogic.Select;
 using EfDatabase.Inventory.MailLogicLotus;
@@ -9,16 +11,16 @@ using MailKit.Net.Pop3;
 using MimeKit;
 
 
-
 namespace LibraryOutlook.SubscribeOutlook
 {
    public class OutlookAutoPop3
    {
-       /// <summary>
-       /// Пересылка с почты oit на пользователей Lotus
-       /// </summary>
-       /// <param name="parameters"></param>
-       public void StartMessageOit(ConfigFile.ConfigFile parameters)
+
+        /// <summary>
+        /// Пересылка с почты oit на пользователей Lotus
+        /// </summary>
+        /// <param name="parameters"></param>
+        public void StartMessageOit(ConfigFile.ConfigFile parameters)
        {
           try
           {
@@ -42,6 +44,25 @@ namespace LibraryOutlook.SubscribeOutlook
                         for (int i = 0; i < messageCount; i++)
                         {
                             MimeMessage message = client.GetMessage(i);
+                            var messageAttaches = message.Attachments as List<MimeEntity> ?? new List<MimeEntity>();
+                            var messageBodyAttaches = new List<MimeEntity>();
+                            messageBodyAttaches.AddRange(message.BodyParts);
+                            var file = messageBodyAttaches.Where(x =>
+                                x.ContentType.MediaType == "image" ||
+                                x.ContentType.MediaType == "application").ToList();
+                            if (file.Count>0)
+                                messageAttaches.AddRange(file);
+                            string body;
+                            var isHtmlMime = false;
+                            if (string.IsNullOrWhiteSpace(message.TextBody))
+                            {
+                                body = message.HtmlBody;
+                                isHtmlMime = true;
+                            }
+                            else
+                            {
+                                body = message.TextBody;
+                            }
                             var date = message.Date;
                             if (date.Date >= DateTime.Now.Date)
                             {
@@ -56,16 +77,23 @@ namespace LibraryOutlook.SubscribeOutlook
                                         IdMail = message.MessageId,
                                         MailAdressSend = parameters.LoginOit,
                                         SubjectMail = message.Subject,
-                                        Body = message.TextBody,
+                                        Body = body,
                                         MailAdress = mailSender,
                                         DateInputServer = date.Date,
                                         NameFile = nameFile,
                                         FullPathFile = fullPath,
-                                        FileMail = zip.StartZipArchive(message.Attachments,fullPath)
+                                        FileMail = zip.StartZipArchive(messageAttaches, fullPath)
                                     };
                                     mailSave.AddModelMailIn(mailMessage);
                                     var mailUsers = mail.FindUserLotusMail(select.FindUserOnUserGroup(userSqlDefault, mailMessage.SubjectMail), "(OIT)");
-                                    mail.SendMailIn(mailMessage, mailUsers);
+                                    if (isHtmlMime)
+                                    {
+                                        mail.SendMailMimeHtml(mailMessage, mailUsers);
+                                    }
+                                    else
+                                    {
+                                        mail.SendMailIn(mailMessage, mailUsers);
+                                    }
                                     count++;
                                     Loggers.Log4NetLogger.Info(new Exception($"УН: {mailMessage.IdMail} Дата/Время: {date} От кого: {mailMessage.MailAdress}"));
                                 }
@@ -123,6 +151,14 @@ namespace LibraryOutlook.SubscribeOutlook
                         for (int i = 0; i < messageCount; i++)
                         {
                             MimeMessage message = client.GetMessage(i);
+                            var messageAttaches = message.Attachments as List<MimeEntity> ?? new List<MimeEntity>();
+                            var messageBodyAttaches = new List<MimeEntity>();
+                            messageBodyAttaches.AddRange(message.BodyParts);
+                            var file = messageBodyAttaches.Where(x =>
+                                x.ContentType.MediaType == "image" ||
+                                x.ContentType.MediaType == "application").ToList();
+                            if (file.Count > 0)
+                                messageAttaches.AddRange(file);
                             var date = message.Date;
                             if (date.Date >= DateTime.Now.Date)
                             {
@@ -130,19 +166,30 @@ namespace LibraryOutlook.SubscribeOutlook
                                 {
                                     var address = (MailboxAddress)message.From[0];
                                     var mailSender = address.Address;
+                                    string body;
+                                    var isHtmlMime = false;
+                                    if (string.IsNullOrWhiteSpace(message.TextBody))
+                                    {
+                                        body = message.HtmlBody;
+                                        isHtmlMime = true;
+                                    }
+                                    else
+                                    {
+                                        body = message.TextBody;
+                                    }
                                     var nameFile = date.ToString("dd.MM.yyyy_HH.mm.ss") + "_" + mailSender.Split('@')[0] + ".zip";
                                         var fullPath = Path.Combine(parameters.PathSaveArchive, nameFile);
                                         MailLotusOutlookIn mailMessage = new MailLotusOutlookIn()
                                         {
                                             IdMail = message.MessageId,
-                                            MailAdressSend = parameters.LoginOit,
+                                            MailAdressSend = parameters.LoginR7751,
                                             SubjectMail = message.Subject,
-                                            Body = message.TextBody,
+                                            Body = body,
                                             MailAdress = mailSender,
                                             DateInputServer = date.Date,
                                             NameFile = nameFile,
                                             FullPathFile = fullPath,
-                                            FileMail = zip.StartZipArchive(message.Attachments, fullPath)
+                                            FileMail = zip.StartZipArchive(messageAttaches, fullPath)
                                         };
                                         mailSave.AddModelMailIn(mailMessage);
                                         //Конец блока сохранения письма
@@ -153,12 +200,18 @@ namespace LibraryOutlook.SubscribeOutlook
                                             var mailUsers = mail.FindUserLotusMail(userSql, "(R7751)");
                                             if (mailUsers.Length > 0)
                                             {
-                                                mail.SendMailIn(mailMessage, mailUsers);
+                                                if (isHtmlMime)
+                                                {
+                                                    mail.SendMailMimeHtml(mailMessage, mailUsers);
+                                                }
+                                                else
+                                                {
+                                                    mail.SendMailIn(mailMessage, mailUsers);
+                                                }
                                             }
                                             count++;
                                             Loggers.Log4NetLogger.Info(new Exception($"УН: {mailMessage.IdMail} Дата/Время: {date} От кого: {mailMessage.MailAdress}"));
                                         }
-
                                 }
                             }
                             else

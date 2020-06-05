@@ -4,6 +4,9 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Globalization;
 using System.IO;
+using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
 using Domino;
 
 
@@ -66,21 +69,21 @@ namespace LotusLibrary.DxlLotus.DocumentGeneration
             Document.Items.Add(new item() { name = "OriginalFrom", Item = GenerateText(new[] { sender }) });
             Document.Items.Add(new item() { name = "From", Item = GenerateText(new []{ sender }) });
             Document.Items.Add(new item()
-            {
-                name = "Body",
-                sign = itemSign.@true,
-                seal = itemSeal.@true,
-                Item =
-                    new richtext()
-                    {
-                        Items = new List<object>()
+                {
+                    name = "Body",
+                    sign = itemSign.@true,
+                    seal = itemSeal.@true,
+                    Item =
+                        new richtext()
                         {
-                            GenerateParagraphNewCollection(string.IsNullOrWhiteSpace(body)?"Отсутствует описание!!!":body),
-                            GenerateParagraphPicture(fileName)
+                            Items = new List<object>()
+                            {
+                                GenerateParagraphNewCollection(string.IsNullOrWhiteSpace(body) ? "Отсутствует описание!!!" : body),
+                                GenerateParagraphPicture(fileName)
+                            }
                         }
-                    }
-            });
-            if (File.Exists(fileName))
+                });
+                if (File.Exists(fileName))
             {
                 Document.Items.Add(new item()
                 {
@@ -122,7 +125,6 @@ namespace LotusLibrary.DxlLotus.DocumentGeneration
             }
             return new par();
         }
-
 
         /// <summary>
         /// Извлекаем файл в Base64
@@ -261,7 +263,6 @@ namespace LotusLibrary.DxlLotus.DocumentGeneration
                     return null;
             }
         }
-
         public void Dispose()
         {
 
