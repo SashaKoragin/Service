@@ -45,7 +45,7 @@ namespace LotusLibrary.DxlLotus.DocumentGeneration
         /// <param name="sender">Отправитель</param>
         /// <param name="body">Тело документа</param>
         /// <param name="fileName">Имя файла</param>
-        public void DocumentGenerationMailMemo(string[] sendTo, string subject, string sender, string body, string fileName)
+        public void DocumentGenerationMailMemo(List<string> sendTo, string subject, string sender, string body, string fileName)
         {
             Document.Items.Add(new item() { name = "Subject", Item = GenerateText(new[] { subject }) });
             Document.Items.Add(new item() { name = "Recipients", Item = GenerateText(new[] { sender }) });
@@ -65,7 +65,7 @@ namespace LotusLibrary.DxlLotus.DocumentGeneration
             Document.Items.Add(new item() { name = "EnterCopyTo", Item = new textlist() { text = new List<text>(new[] { GenerateText(new string[] { }) }) } });
             Document.Items.Add(new item() { name = "EnterBlindCopyTo", Item = new textlist() { text = new List<text>(new[] { GenerateText(new string[] { }) }) } });
             Document.Items.Add(new item() { name = "OriginalTo", Item = GenerateText(new[] { sender }) });
-            Document.Items.Add(new item() { name = "SendTo", Item = GenerateTextList(sendTo) });
+            Document.Items.Add(new item() { name = "SendTo", Item = GenerateTextList(sendTo.ToArray()) });
             Document.Items.Add(new item() { name = "OriginalFrom", Item = GenerateText(new[] { sender }) });
             Document.Items.Add(new item() { name = "From", Item = GenerateText(new []{ sender }) });
             Document.Items.Add(new item()

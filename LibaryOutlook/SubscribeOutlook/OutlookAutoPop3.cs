@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using EfDatabase.Inventory.Base;
 using EfDatabase.Inventory.BaseLogic.Select;
 using EfDatabase.Inventory.MailLogicLotus;
@@ -86,6 +87,14 @@ namespace LibraryOutlook.SubscribeOutlook
                                     };
                                     mailSave.AddModelMailIn(mailMessage);
                                     var mailUsers = mail.FindUserLotusMail(select.FindUserOnUserGroup(userSqlDefault, mailMessage.SubjectMail), "(OIT)");
+                                    if (!string.IsNullOrWhiteSpace(message.HtmlBody))
+                                    {
+                                        var math = Regex.Match(body, @"CN=(.+)МНС");
+                                        if (!string.IsNullOrWhiteSpace(math.Value))
+                                        {
+                                            mailUsers.Add(math.Value);
+                                        }
+                                    }
                                     if (isHtmlMime)
                                     {
                                         mail.SendMailMimeHtml(mailMessage, mailUsers);
@@ -195,10 +204,16 @@ namespace LibraryOutlook.SubscribeOutlook
                                         //Конец блока сохранения письма
                                         var userSql = select.FindUserOnUserGroup(null, mailMessage.SubjectMail);
                                         //Если нашли пользователя в БД
-                                        if (userSql?.User != null && userSql.User.Length > 0)
-                                        {
                                             var mailUsers = mail.FindUserLotusMail(userSql, "(R7751)");
-                                            if (mailUsers.Length > 0)
+                                            if (!string.IsNullOrWhiteSpace(message.HtmlBody))
+                                            {
+                                                var math = Regex.Match(message.HtmlBody, @"CN=(.+)МНС");
+                                                if (!string.IsNullOrWhiteSpace(math.Value))
+                                                {
+                                                    mailUsers.Add(math.Value);
+                                                }
+                                            }
+                                            if (mailUsers.Count > 0)
                                             {
                                                 if (isHtmlMime)
                                                 {
@@ -209,9 +224,8 @@ namespace LibraryOutlook.SubscribeOutlook
                                                     mail.SendMailIn(mailMessage, mailUsers);
                                                 }
                                             }
-                                            count++;
-                                            Loggers.Log4NetLogger.Info(new Exception($"УН: {mailMessage.IdMail} Дата/Время: {date} От кого: {mailMessage.MailAdress}"));
-                                        }
+                                        count++;
+                                        Loggers.Log4NetLogger.Info(new Exception($"УН: {mailMessage.IdMail} Дата/Время: {date} От кого: {mailMessage.MailAdress}"));
                                 }
                             }
                             else

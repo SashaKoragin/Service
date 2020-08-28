@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using Domino;
 
@@ -8,6 +9,14 @@ namespace LotusLibrary.DbConnected
     {
         public NotesSession Session { get; set; }
         public NotesDatabase Db { get; set; }
+        /// <summary>
+        /// Document
+        /// </summary>
+        public NotesDocument Document { get; set; }
+        /// <summary>
+        /// View
+        /// </summary>
+        public NotesView NotesView { get; set; }
         /// <summary>
         /// Инициализация Пароль
         /// </summary>
@@ -35,7 +44,7 @@ namespace LotusLibrary.DbConnected
         /// <param name="server">Сервер</param>
         /// <param name="database">Наименование БД</param>
         /// <param name="isCreateDb">Создаем БД или нет по умолчанию нет</param>
-        public NotesDatabase LotusConnectedDataBaseServer( string server, string database, bool isCreateDb = false)
+        public NotesDatabase LotusConnectedDataBaseServer(string server, string database, bool isCreateDb = false)
         {
             try
             {
@@ -59,6 +68,53 @@ namespace LotusLibrary.DbConnected
             }
             return null;
         }
+        /// <summary>
+        /// Удаление всей почты если переполнение документами и сжатие БД
+        /// Нет доступа на Compact() БД
+        /// </summary>
+        public void DeleteDataBaseAllMailSizeWarning()
+        {
+            var sizeWarning = Db.SizeWarning * 0.001; //Мегабайт
+            var size = Db.Size/1024/1024;  //Байты в Мегабайты
+            if (size > sizeWarning)
+            {
+                try
+                {
+                    Db.AllDocuments.RemoveAll(true);
+                    NotesView = GetViewLotus("$SoftDeletions");
+                    Document = NotesView.GetFirstDocument();
+                    while (Document != null)
+                    {
+                       var universalId = Document.UniversalID;
+                       var doc = Document;
+                       Document = NotesView.GetNextDocument(Document);
+                       doc.RemovePermanently(true);
+                       if (doc.IsDeleted)
+                       {
+                          Loggers.Log4NetLogger.Info(new Exception($"Документ под ID: {universalId} удален!")); 
+                       }
+                    }
+                    NotesView.Refresh();
+                    Loggers.Log4NetLogger.Error(new Exception($"Срочно требуется сжатие БД {Db.FileName}!!!"));
+                }
+                catch (Exception ex)
+                {
+                    Loggers.Log4NetLogger.Error(ex);
+                }
+                finally
+                {
+                    if (Document != null)
+                        Marshal.ReleaseComObject(Document);
+                    Document = null;
+                    if (NotesView != null)
+                        Marshal.ReleaseComObject(NotesView);
+                    NotesView = null;
+                }
+            }
+        }
+
+
+
         /// <summary>
         /// Получение представления по имени
         /// </summary>

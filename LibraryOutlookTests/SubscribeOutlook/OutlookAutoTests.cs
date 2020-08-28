@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Domino;
 using Domino;
 using EfDatabase.Inventory.Base;
@@ -51,7 +52,7 @@ namespace LibraryOutlookTests.SubscribeOutlook
             var lotusMail = db.LotusConnectedDataBaseServer("Lotus7751/I7751/R77/МНС", "mail\\акоряг.nsf");
             var streame = db.Session.CreateStream();
             var filename = $"d:\\Test2.dxl";
-            var docs = lotusMail.Search("Select($MessageID= \"<OFD7DE7C85.A63D4140-ON4325857D.004D658C-4325857D.004D6681@LocalDomain>\")", null, 0);
+            var docs = lotusMail.Search("Select($MessageID= \"<OF48F1D289.7607B3B0-ON4325857E.0041458C-4325857E.004145A7@LocalDomain>\")", null, 0);
             NotesDXLExporter export = db.Session.CreateDXLExporter();
             var t = export.Export(docs.GetFirstDocument());
             File.WriteAllText(filename, t);
@@ -62,13 +63,19 @@ namespace LibraryOutlookTests.SubscribeOutlook
         {
             LibraryOutlook.ConfigFile.ConfigFile Parameters = new LibraryOutlook.ConfigFile.ConfigFile();
             OutlookAutoPop3 t = new OutlookAutoPop3();
-            t.StartMessageOit(Parameters);
+            t.StartMessageR7751(Parameters);
         }
         [TestMethod()]
         public void FindUserLotus()
         {
-            var smtp = new OutlookAutoSmtp();
-            smtp.SendSmtpMessage(new LibraryOutlook.ConfigFile.ConfigFile());
+            //var str = "ваываываCN=Михаил Витальевич Мочалов/OU=I7751а/OU=R77/O=МНвСвавыавыаыв";
+
+            //var math = Regex.Match(str, @"CN=(.+)МНС");
+            //var fio = math.Value;
+            //var fioArray = fio.Split(' ');
+            //var fioSelectDb = $"{fioArray[1]} {fioArray[2]} {fioArray[0]}";
+             var smtp = new OutlookAutoSmtp();
+              smtp.SendSmtpMessage(new LibraryOutlook.ConfigFile.ConfigFile());
         }
 
         [TestMethod()]

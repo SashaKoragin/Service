@@ -42,39 +42,43 @@ namespace LotusLibrary.MailSender
         /// </summary>
         /// <param name="userSql">Идентификатор из БД Инвентаризация</param>
         /// <param name="infoMail">Информация для Log</param>
-        public string[] FindUserLotusMail(EfDatabaseXsdLotusUser.UserLotus userSql,string infoMail)
+        public List<string> FindUserLotusMail(EfDatabaseXsdLotusUser.UserLotus userSql,string infoMail)
         {
           try
-          { 
+          {
+              var mailUsers = new List<string>();
+              if (userSql?.User == null || userSql.User.Length <= 0) return mailUsers;
               var book = Db.LotusConnectedDataBaseServer(Config.LotusServer, "names.nsf");
-              var mailUsers = new string[userSql.User.Length];
-              var i = 0;
-              foreach (var user in userSql.User)
-              {
-                 var arrayFio = user.Name.Split(' ');
-                 var id = user.TabelNumber.Substring(0, 4);
-                 var documentAllMail = book.Search(String.Format("Select(Person_LastNameRUS=\"" + arrayFio[0] + "\"&Person_FirstNameRUS=\"" + arrayFio[1] + "\"&Person_MiddleNameRUS=\"" + arrayFio[2] + "\"&@Contains(FullName;\"" + id + "\"))"), null, 0);
-                 if (documentAllMail.Count == 0)
-                 {
-                     documentAllMail = book.Search(String.Format("@Select(EmployeeID=\"" + user.TabelNumber + "\")"), null, 0);
-                 }
-                 var docMail = documentAllMail.GetFirstDocument();
-                 if (docMail == null)
-                 {
-                     Loggers.Log4NetLogger.Info(new Exception($"Пользователь с табельным номером {user.TabelNumber} не найден в БД Lotus Mosnalog's Address Book {infoMail}"));
-                 }
-                 while (docMail != null)
-                 {
-                     string fullName = docMail.GetItemValue(@"FullName")[0];
-                     string mailDomain = docMail.GetItemValue(@"MailDomain")[0];
-                     mailUsers[i] = String.Concat(fullName.Replace("CN=", "")
-                         .Replace("OU=", "")
-                         .Replace("O=", ""), "@", mailDomain);
-                     docMail = documentAllMail.GetNextDocument(docMail);
-                     i++;
-                 }
-              }
-              return mailUsers;
+                foreach (var user in userSql.User)
+                {
+                    var arrayFio = user.Name.Split(' ');
+                    var id = user.TabelNumber.Substring(0, 4);
+                    var documentAllMail = book.Search(
+                        String.Format("Select(Person_LastNameRUS=\"" + arrayFio[0] + "\"&Person_FirstNameRUS=\"" +
+                                      arrayFio[1] + "\"&Person_MiddleNameRUS=\"" + arrayFio[2] +
+                                      "\"&@Contains(FullName;\"" + id + "\"))"), null, 0);
+                    if (documentAllMail.Count == 0)
+                    {
+                        documentAllMail =
+                            book.Search(String.Format("@Select(EmployeeID=\"" + user.TabelNumber + "\")"), null, 0);
+                    }
+                    var docMail = documentAllMail.GetFirstDocument();
+                    if (docMail == null)
+                    {
+                        Loggers.Log4NetLogger.Info(new Exception(
+                            $"Пользователь с табельным номером {user.TabelNumber} не найден в БД Lotus Mosnalog's Address Book {infoMail}"));
+                    }
+                    while (docMail != null)
+                    {
+                        string fullName = docMail.GetItemValue(@"FullName")[0];
+                        string mailDomain = docMail.GetItemValue(@"MailDomain")[0];
+                        mailUsers.Add(String.Concat(fullName.Replace("CN=", "")
+                            .Replace("OU=", "")
+                            .Replace("O=", ""), "@", mailDomain));
+                        docMail = documentAllMail.GetNextDocument(docMail);
+                    }
+                }
+                return mailUsers;
           }
           catch (Exception e)
           {
@@ -88,9 +92,10 @@ namespace LotusLibrary.MailSender
         /// </summary>
         /// <param name="mailOutlook">Письма заступившие</param>
         /// <param name="arrayUsers">Рассылка пользователям</param>
-        public void SendMailIn(MailLotusOutlookIn mailOutlook,string[] arrayUsers)
+        public void SendMailIn(MailLotusOutlookIn mailOutlook, List<string> arrayUsers)
         {
             Db.LotusConnectedDataBaseServer(Config.LotusServer, Config.LotusMailSend);
+            Db.DeleteDataBaseAllMailSizeWarning();
             DocumentGenerationAllDxl document = new DocumentGenerationAllDxl(Db.Db);
             document.DocumentGenerationMailMemo(arrayUsers, "От кого: " + mailOutlook.MailAdress + " Тема: " + mailOutlook.SubjectMail, Db.Session.UserName, mailOutlook.Body, mailOutlook.FullPathFile);
             DonloadOnCreateDxlFile download = new DonloadOnCreateDxlFile();
@@ -107,7 +112,7 @@ namespace LotusLibrary.MailSender
         /// </summary>
         /// <param name="mailOutlook">Письма заступившие</param>
         /// <param name="arrayUsers">Рассылка пользователям</param>
-        public void SendMailMimeHtml(MailLotusOutlookIn mailOutlook, string[] arrayUsers)
+        public void SendMailMimeHtml(MailLotusOutlookIn mailOutlook, List<string> arrayUsers)
         {
             Db.LotusConnectedDataBaseServer(Config.LotusServer, Config.LotusMailSend);
             NotesStream = Db.Db.Parent.CreateStream();
@@ -116,12 +121,13 @@ namespace LotusLibrary.MailSender
             {
                 if (Db.Db == null)
                     throw new InvalidOperationException("Фатальная ошибка нет соединения с сервером!");
+                Db.DeleteDataBaseAllMailSizeWarning();
                 Document.AppendItemValue("Subject", "От кого: " + mailOutlook.MailAdress + " Тема: " + mailOutlook.SubjectMail);
                 Document.AppendItemValue("Recipients", Db.Session.UserName);
                 Document.AppendItemValue("OriginalTo", Db.Session.UserName);
                 Document.AppendItemValue("From", Db.Session.UserName);
                 Document.AppendItemValue("OriginalFrom", Db.Session.UserName);
-                Document.AppendItemValue("SendTo", arrayUsers);
+                Document.AppendItemValue("SendTo", arrayUsers.ToArray());
 
                 var mimeEntity = Document.CreateMIMEEntity();
 
@@ -178,7 +184,7 @@ namespace LotusLibrary.MailSender
         /// <param name="subject">Тема</param>
         /// <param name="body">Тело документа</param>
         /// <param name="fileFullPathName">Имя файла</param>
-        public void SendMailAutoOutput(string[] arrayUsers, string subject, string body, string fileFullPathName = null)
+        public void SendMailAutoOutput(List<string> arrayUsers, string subject, string body, string fileFullPathName = null)
         {
             if (Db.Db != null)
             {

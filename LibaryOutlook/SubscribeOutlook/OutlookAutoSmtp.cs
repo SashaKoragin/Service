@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -40,7 +41,7 @@ namespace LibraryOutlook.SubscribeOutlook
                         mailLotusOutlookOut.NameFileZip = nameFile;
                     }
                     //Проверка почты
-                    var user = new[] { mailLotusOutlookOut.MailAdressIn };
+                    var user = new List<string>() {mailLotusOutlookOut.MailAdressIn};
                     var arrayMail = MailArraySubject(mailLotusOutlookOut.MailAdressOut);
                     if (arrayMail.Length > 0)
                     {
@@ -50,8 +51,9 @@ namespace LibraryOutlook.SubscribeOutlook
                             MimeMessage mailToClient = new MimeMessage();
                             mailToClient.To.Add(new MailboxAddress(mail));
                             mailToClient.Subject = string.IsNullOrWhiteSpace(mailLotusOutlookOut.SubjectMail) ? "" : mailLotusOutlookOut.SubjectMail;
-                            mailToClient.From.Add(new MailboxAddress(mailLotusOutlookOut.MailAdressIn, parameters.LoginR7751));
+                            mailToClient.From.Add(new MailboxAddress(mailLotusOutlookOut.MailAdressIn, parameters.LoginR7751)); //Сюда идентификатор
                             mailToClient.Body = builder.ToMessageBody();
+                            
                             try
                             {
                                 using (var smtp = new MailKit.Net.Smtp.SmtpClient())
