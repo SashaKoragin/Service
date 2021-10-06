@@ -2,15 +2,18 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Mail;
 using System.Text.RegularExpressions;
 using EfDatabase.Inventory.MailLogicLotus;
 using LotusLibrary.MailSender;
+using MailKit;
+using MailKit.Net.Smtp;
 using MimeKit;
 
 namespace LibraryOutlook.SubscribeOutlook
 {
-   public class OutlookAutoSmtp
-   {
+   public class OutlookAutoSmtp 
+    {
 
        public MailSender Mail { get; set; }
         /// <summary>
@@ -28,6 +31,7 @@ namespace LibraryOutlook.SubscribeOutlook
                 foreach (var mailLotusOutlookOut in dbSend)
                 {
                     //Сначала манипуляции с файлами и архивами а потом отправка
+                   
                     var builder = new BodyBuilder() {TextBody = mailLotusOutlookOut.Body};
                     if (mailLotusOutlookOut.FullPathListFile != null)
                     {
@@ -52,12 +56,16 @@ namespace LibraryOutlook.SubscribeOutlook
                             mailToClient.To.Add(new MailboxAddress(mail));
                             mailToClient.Subject = string.IsNullOrWhiteSpace(mailLotusOutlookOut.SubjectMail) ? "" : mailLotusOutlookOut.SubjectMail;
                             mailToClient.From.Add(new MailboxAddress(mailLotusOutlookOut.MailAdressIn, parameters.LoginR7751)); //Сюда идентификатор
+                            mailToClient.Headers[HeaderId.MessageId] = mailToClient.MessageId;
+                            mailToClient.Headers[HeaderId.ResentMessageId] = mailToClient.MessageId;
+                            mailToClient.Headers[HeaderId.DispositionNotificationTo] = parameters.LoginR7751;
+                            mailToClient.Headers[HeaderId.ReturnReceiptTo] = parameters.LoginR7751;
                             mailToClient.Body = builder.ToMessageBody();
-                            
                             try
                             {
-                                using (var smtp = new MailKit.Net.Smtp.SmtpClient())
+                                using (var smtp = new SmtpCastomClient.SmtpCastomClient())
                                 {
+                                    smtp.DeliveryStatusNotificationType = DeliveryStatusNotificationType.Full;
                                     smtp.CheckCertificateRevocation = false;
                                     smtp.Connect(parameters.Pop3Address, 465, true);
                                     smtp.Authenticate(parameters.LoginR7751, parameters.PasswordR7751);
@@ -97,6 +105,67 @@ namespace LibraryOutlook.SubscribeOutlook
             }
         }
         /// <summary>
+        /// Отправка отчета в офис Консультант плюс на анализ наличия ошибок в системе
+        /// </summary>
+        /// <param name="parameters">Параметры конфигурации</param>
+        public void SendSmtpConsultantPlusReport(ConfigFile.ConfigFile parameters)
+        {
+            try
+            {
+                ZipAttachments zipAttach = new ZipAttachments();
+                var builder = new BodyBuilder() { TextBody = $"Автоматическая отправка отчетов Консультант плюс (Раз в сутки в {parameters.Hours} часов {parameters.Minutes} минут)" };
+                var pathListReport = new List<string>()
+                {
+                    parameters.PathConsultantPlusReceive,
+                    parameters.PathConsultantPlusReceiveTemp,
+                    parameters.PathConsultantPlusSts
+                };
+                foreach (var pathReport in pathListReport)
+                {
+                    var allFileDirectory = Directory.GetFiles(pathReport).Where(s=>parameters.ExtensionsFileReport.Contains(Path.GetExtension(s))).ToArray();
+                    var nameFile = pathReport.Split(Path.DirectorySeparatorChar).Last() + ".zip";
+                    var fullPathZip = Path.Combine(parameters.PathSaveArchive, nameFile);
+                    zipAttach.StartZipArchiveOut(allFileDirectory, fullPathZip, false);
+                    builder.Attachments.Add(fullPathZip);
+                }
+                MimeMessage mailToClient = new MimeMessage();
+                mailToClient.To.Add(new MailboxAddress(parameters.MailReport));
+                mailToClient.Subject = "Отчеты по папкам Receive, ReceiveTemp, Sts ";
+                mailToClient.From.Add(new MailboxAddress("Автоматическая рассылка писем!", parameters.LoginR7751)); //Сюда идентификатор
+                mailToClient.Headers[HeaderId.MessageId] = mailToClient.MessageId;
+                mailToClient.Headers[HeaderId.ResentMessageId] = mailToClient.MessageId;
+                mailToClient.Headers[HeaderId.DispositionNotificationTo] = parameters.LoginR7751;
+                mailToClient.Headers[HeaderId.ReturnReceiptTo] = parameters.LoginR7751;
+
+                mailToClient.Body = builder.ToMessageBody();
+                try
+                {
+                    using (var smtp = new SmtpCastomClient.SmtpCastomClient())
+                    {
+                        smtp.DeliveryStatusNotificationType = DeliveryStatusNotificationType.Full;
+                        smtp.CheckCertificateRevocation = false;
+                        smtp.Connect(parameters.Pop3Address, 465, true);
+                        smtp.Authenticate(parameters.LoginR7751, parameters.PasswordR7751);
+                        smtp.Send(mailToClient);
+                        smtp.Disconnect(true);
+                    }
+                    Loggers.Log4NetLogger.Info(new Exception($"Отправка письма отчетов консультант плюс на адрес {parameters.MailReport}"));
+                }
+                catch (Exception ex)
+                {
+                    Loggers.Log4NetLogger.Error(ex);
+                }
+                //Очистить временную папку с файлами
+                zipAttach.DropAllFileToPath(parameters.PathSaveArchive);
+                Loggers.Log4NetLogger.Info(new Exception("Отправка отчетов Консультант плюс закончена успешно!"));
+            }
+            catch (Exception ex)
+            {
+                Loggers.Log4NetLogger.Error(ex);
+            }
+        }
+
+        /// <summary>
         /// Поиск всех Email Адресов
         /// </summary>
         /// <param name="emailAddress">Тема описание из Lotus</param>
@@ -105,5 +174,6 @@ namespace LibraryOutlook.SubscribeOutlook
         {
             return Regex.Matches(emailAddress, @"([\w-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)").Cast<Match>().Select(m => m.Value).ToArray();
         }
+
    }
 }

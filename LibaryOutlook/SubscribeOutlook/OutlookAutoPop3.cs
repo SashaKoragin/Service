@@ -48,9 +48,11 @@ namespace LibraryOutlook.SubscribeOutlook
                             var messageAttaches = message.Attachments as List<MimeEntity> ?? new List<MimeEntity>();
                             var messageBodyAttaches = new List<MimeEntity>();
                             messageBodyAttaches.AddRange(message.BodyParts);
+                            var calendar = messageBodyAttaches.Where(x => x.ContentType.MimeType == "text/calendar").ToList();
                             var file = messageBodyAttaches.Where(x =>
                                 x.ContentType.MediaType == "image" ||
                                 x.ContentType.MediaType == "application").ToList();
+
                             if (file.Count>0)
                                 messageAttaches.AddRange(file);
                             string body;
@@ -69,6 +71,11 @@ namespace LibraryOutlook.SubscribeOutlook
                             {
                                 if (!mailSave.IsExistsBdMail(message.MessageId))
                                 {
+                                    if (calendar.Count > 0)
+                                    {
+                                        var calendarVks = new CalendarVks();
+                                        body = calendarVks.CalendarParser(calendar, message.MessageId);
+                                    }
                                     var address = (MailboxAddress)message.From[0];
                                     var mailSender = address.Address;
                                     var nameFile = date.ToString("dd.MM.yyyy_HH.mm.ss") + "_" + mailSender.Split('@')[0] + ".zip";
@@ -80,7 +87,7 @@ namespace LibraryOutlook.SubscribeOutlook
                                         SubjectMail = message.Subject,
                                         Body = body,
                                         MailAdress = mailSender,
-                                        DateInputServer = date.Date,
+                                        DateInputServer = date.DateTime,
                                         NameFile = nameFile,
                                         FullPathFile = fullPath,
                                         FileMail = zip.StartZipArchive(messageAttaches, fullPath)
@@ -113,6 +120,7 @@ namespace LibraryOutlook.SubscribeOutlook
                               client.DeleteMessage(i);
                             }
                         }
+                        mailSave.Dispose();
                         Loggers.Log4NetLogger.Info(new Exception("Количество пришедшей (OIT) почты:" + count));
                     }
                     mail.Dispose();
@@ -195,7 +203,7 @@ namespace LibraryOutlook.SubscribeOutlook
                                             SubjectMail = message.Subject,
                                             Body = body,
                                             MailAdress = mailSender,
-                                            DateInputServer = date.Date,
+                                            DateInputServer = date.DateTime,
                                             NameFile = nameFile,
                                             FullPathFile = fullPath,
                                             FileMail = zip.StartZipArchive(messageAttaches, fullPath)
@@ -234,6 +242,7 @@ namespace LibraryOutlook.SubscribeOutlook
                                 client.DeleteMessage(i);
                             }
                         }
+                        mailSave.Dispose();
                         Loggers.Log4NetLogger.Info(new Exception("Количество пришедшей почты (R7751):" + count));
                     }
                     mail.Dispose();

@@ -1,4 +1,5 @@
-﻿using System.Configuration;
+﻿using System;
+using System.Configuration;
 
 namespace LibraryOutlook.ConfigFile
 {
@@ -14,12 +15,19 @@ namespace LibraryOutlook.ConfigFile
             LoginR7751 = ConfigurationManager.AppSettings["LoginR7751"];
             PasswordR7751 = ConfigurationManager.AppSettings["PasswordR7751"];
             Interval = ConfigurationManager.AppSettings["Interval"];
-
+            //Настройки обратной связи с Консультант+
+            Hours = Convert.ToInt32(ConfigurationManager.AppSettings["Hours"]);
+            Minutes = Convert.ToInt32(ConfigurationManager.AppSettings["Minutes"]);
+            MailReport = ConfigurationManager.AppSettings["MailReport"];
+            ExtensionsFileReport = ConfigurationManager.AppSettings["ExtensionsFileReport"];
+            PathConsultantPlusReceive = ConfigurationManager.AppSettings["PathConsultantPlusReceive"];
+            PathConsultantPlusReceiveTemp = ConfigurationManager.AppSettings["PathConsultantPlusReceiveTemp"];
+            PathConsultantPlusSts = ConfigurationManager.AppSettings["PathConsultantPlusSts"];
         }
-        /// <summary>
-        /// Интервал 10 минут
-        /// </summary>
-        public string Interval { get; set; }
+    /// <summary>
+    /// Интервал 10 минут
+    /// </summary>
+    public string Interval { get; set; }
 
         /// <summary>
         /// Адрес сервера POP3
@@ -45,5 +53,34 @@ namespace LibraryOutlook.ConfigFile
         /// Путь к сохранению архива
         /// </summary>
         public string PathSaveArchive { get; set; }
+        /// <summary>
+        /// Час запуска отправки отчета
+        /// </summary>
+        public int Hours { get; set; }
+        /// <summary>
+        /// Минута запуска отправки отчета
+        /// </summary>
+        public int Minutes { get; set; }
+        /// <summary>
+        /// Почта обратной связи с консультант+
+        /// </summary>
+        public string MailReport { get; set; }
+        /// <summary>
+        /// Файлы расширения для отчетов
+        /// </summary>
+        public string ExtensionsFileReport { get; set; }
+        /// <summary>
+        /// Путь к папке Консультант Receive
+        /// </summary>
+        public string PathConsultantPlusReceive { get; set; }
+        /// <summary>
+        /// Путь к папке Консультант Receive_Temp
+        /// </summary>
+        public string PathConsultantPlusReceiveTemp { get; set; }
+        /// <summary>
+        /// Путь к папке Консультант Sts
+        /// </summary>
+        public string PathConsultantPlusSts { get; set; }
+
     }
 }

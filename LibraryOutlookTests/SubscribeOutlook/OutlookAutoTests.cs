@@ -18,6 +18,14 @@ namespace LibraryOutlookTests.SubscribeOutlook
     public class OutlookAutoTests
     {
         [TestMethod()]
+        public void StartMessageOITTest()
+        {
+            OutlookAutoPop3 outlook = new OutlookAutoPop3();
+            outlook.StartMessageOit(new LibraryOutlook.ConfigFile.ConfigFile());
+        }
+
+
+        [TestMethod()]
         public void StartMessageTest()
         {
             OutlookAutoPop3 outlook = new OutlookAutoPop3();
@@ -68,14 +76,22 @@ namespace LibraryOutlookTests.SubscribeOutlook
         [TestMethod()]
         public void FindUserLotus()
         {
-            //var str = "ваываываCN=Михаил Витальевич Мочалов/OU=I7751а/OU=R77/O=МНвСвавыавыаыв";
-
-            //var math = Regex.Match(str, @"CN=(.+)МНС");
-            //var fio = math.Value;
-            //var fioArray = fio.Split(' ');
-            //var fioSelectDb = $"{fioArray[1]} {fioArray[2]} {fioArray[0]}";
-             var smtp = new OutlookAutoSmtp();
-              smtp.SendSmtpMessage(new LibraryOutlook.ConfigFile.ConfigFile());
+            var smtp = new OutlookAutoSmtp();
+            smtp.SendSmtpMessage(new LibraryOutlook.ConfigFile.ConfigFile());
+        }
+        [TestMethod()]
+        public void TestSendReportConsultant()
+        {
+            try
+            {
+                var smtp = new OutlookAutoSmtp();
+                smtp.SendSmtpConsultantPlusReport(new LibraryOutlook.ConfigFile.ConfigFile());
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
         }
 
         [TestMethod()]

@@ -73,7 +73,7 @@ Patch dialog sequence:
               </Control>
               <Control Id="Text5" Type="Text" X="10" Y="90" Width="90" Height="15" Transparent="yes" NoPrefix="yes" Text="Логин:"></Control>
               <Control Id="Pop3Login" Type="Edit" X="110" Y="90" Width="150" Height="15" Property="LOGIN" Text="[LOGIN]" Indirect="no">
-                <Property Id="LOGIN" Value="oit.r7751@nalog.ru" />
+                <Property Id="LOGIN" Value="oit.r7751@tax.gov.ru" />
               </Control>
               <Control Id="Text6" Type="Text" X="10" Y="110" Width="90" Height="15" Transparent="yes" NoPrefix="yes" Text="Пароль:"></Control>
               <Control Id="Pop3Password" Type="Edit" X="110" Y="110" Width="150" Height="15" Property="PASSWORD" Text="[PASSWORD]" Indirect="no">

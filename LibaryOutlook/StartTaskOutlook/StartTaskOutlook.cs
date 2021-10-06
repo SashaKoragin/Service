@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Timers;
 using LibraryOutlook.SubscribeOutlook;
+using Org.BouncyCastle.Asn1.Cms;
 
 namespace LibraryOutlook.StartTaskOutlook
 {
@@ -13,7 +14,11 @@ namespace LibraryOutlook.StartTaskOutlook
         private readonly ConfigFile.ConfigFile parameters = new ConfigFile.ConfigFile();
 
         private readonly Timer timerMessage = new Timer();
-
+       
+        /// <summary>
+        /// Временная задача для отправки отчета по Консультант +
+        /// </summary>
+        private readonly Timer timerConsultantPlusSendReport = new Timer();
         /// <summary>
         /// Класс запуска фоновой задачи
         /// </summary>
@@ -26,6 +31,12 @@ namespace LibraryOutlook.StartTaskOutlook
             timerMessage.AutoReset = true;
             timerMessage.Elapsed += TimerMessage_Tick;
             timerMessage.Start();
+            timerConsultantPlusSendReport.Interval = 60000;
+            timerConsultantPlusSendReport.Enabled = true;
+            timerConsultantPlusSendReport.AutoReset = true;
+            timerConsultantPlusSendReport.Elapsed += TimerSendReportConsultantPlus;
+            timerConsultantPlusSendReport.Start();
+
         }
 
         /// <summary>
@@ -40,6 +51,20 @@ namespace LibraryOutlook.StartTaskOutlook
             OutlookAutoSmtp.SendSmtpMessage(parameters);
         }
         /// <summary>
+        /// Отправка отчетов в офис консультанта плюс
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void TimerSendReportConsultantPlus(object sender, EventArgs e)
+        {
+            DateTime date = DateTime.Now;
+            if (date.Hour == parameters.Hours && date.Minute == parameters.Minutes)
+            {
+                OutlookAutoSmtp.SendSmtpConsultantPlusReport(parameters);
+            }
+        }
+
+        /// <summary>
         /// Освобождение памяти
         /// </summary>
         public void Dispose()
@@ -47,6 +72,7 @@ namespace LibraryOutlook.StartTaskOutlook
             OutlookAutoPop3 = null;
             OutlookAutoSmtp = null;
             timerMessage.Dispose();
+            timerConsultantPlusSendReport.Dispose();
         }
     }
 }

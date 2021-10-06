@@ -44,6 +44,7 @@ namespace LibraryOutlook.SubscribeOutlook
                                   zipToWrite.AlternateEncoding = Encoding.GetEncoding(866);
                                   zipToWrite.PutNextEntry(nameFile);
                                   zipToWrite.Write(byteBuffer, 0, byteBuffer.Length);
+                                  //Нужен ли здесь пароль на архивы
                               }
                           }
                         
@@ -62,36 +63,45 @@ namespace LibraryOutlook.SubscribeOutlook
         /// </summary>
         /// <param name="collectionNameFile">Массив имен файлов</param>
         /// <param name="fullPathZip">Полный путь к наименованию Архива файла</param>
+        /// <param name="isDoublicate"></param>
         /// <returns>Полный путь к архиву</returns>
-        public byte[] StartZipArchiveOut(string[] collectionNameFile, string fullPathZip)
+        public byte[] StartZipArchiveOut(string[] collectionNameFile, string fullPathZip, bool isDoublicate = true)
         {
-            if (collectionNameFile.Length > 0)
+            try
             {
-                using (var zip = File.Open(fullPathZip, FileMode.OpenOrCreate, FileAccess.ReadWrite))
+                if (collectionNameFile.Length > 0)
                 {
-                    using (var zipToWrite = new ZipOutputStream(zip))
+                    using (var zip = File.Open(fullPathZip, FileMode.OpenOrCreate, FileAccess.ReadWrite))
                     {
-                        var i = 0;
-                        foreach (var fullNameFile in collectionNameFile)
+                        using (var zipToWrite = new ZipOutputStream(zip))
                         {
-                            var fileStream = File.ReadAllBytes(fullNameFile);
-                            var nameFile = $"{i}_{Path.GetFileName(fullNameFile)}";
-                            using (Stream newFileStream = new MemoryStream(fileStream))
+                            var i = 0;
+                            foreach (var fullNameFile in collectionNameFile)
                             {
-                                var byteBuffer = new byte[newFileStream.Length - 1];
-                                newFileStream.Read(byteBuffer, 0, byteBuffer.Length);
-                                zipToWrite.EnableZip64 = Zip64Option.Never;
-                                zipToWrite.AlternateEncodingUsage = ZipOption.Always;
-                                zipToWrite.AlternateEncoding = Encoding.GetEncoding(866);
-                                zipToWrite.PutNextEntry(nameFile);
-                                zipToWrite.Write(byteBuffer, 0, byteBuffer.Length);
+                                var fileStream = File.ReadAllBytes(fullNameFile);
+                                var nameFile = isDoublicate ? $"{i}_{Path.GetFileName(fullNameFile)}" : $"{Path.GetFileName(fullNameFile)}";
+                                using (Stream newFileStream = new MemoryStream(fileStream))
+                                {
+                                    var byteBuffer = new byte[newFileStream.Length];
+                                    newFileStream.Read(byteBuffer, 0, byteBuffer.Length);
+                                    zipToWrite.EnableZip64 = Zip64Option.Never;
+                                    zipToWrite.AlternateEncodingUsage = ZipOption.Always;
+                                    zipToWrite.AlternateEncoding = Encoding.GetEncoding(866);
+                                    zipToWrite.PutNextEntry(nameFile);
+                                    zipToWrite.Write(byteBuffer, 0, byteBuffer.Length);
+                                }
+                                i++;
                             }
-                            i++;
                         }
+                        zip.Close();
                     }
-                    zip.Close();
+                    return File.ReadAllBytes(fullPathZip);
                 }
-                return File.ReadAllBytes(fullPathZip);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
             }
             return null;
         }
