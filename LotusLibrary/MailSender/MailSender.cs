@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Runtime.InteropServices;
 using Domino;
 using EfDatabase.Inventory.Base;
 using LotusLibrary.DbConnected;
 using LotusLibrary.DxlLotus;
 using LotusLibrary.DxlLotus.DocumentGeneration;
+using File = System.IO.File;
 
 
 namespace LotusLibrary.MailSender
@@ -42,7 +42,7 @@ namespace LotusLibrary.MailSender
         /// </summary>
         /// <param name="userSql">Идентификатор из БД Инвентаризация</param>
         /// <param name="infoMail">Информация для Log</param>
-        public List<string> FindUserLotusMail(EfDatabaseXsdLotusUser.UserLotus userSql,string infoMail)
+        public List<string> FindUserLotusMail(EfDatabase.XsdLotusUser.UserLotus userSql,string infoMail)
         {
           try
           {
@@ -51,7 +51,7 @@ namespace LotusLibrary.MailSender
               var book = Db.LotusConnectedDataBaseServer(Config.LotusServer, "names.nsf");
                 foreach (var user in userSql.User)
                 {
-                    var arrayFio = user.Name.Split(' ');
+                    var arrayFio = user.NameUser.Split(' ');
                     var id = user.TabelNumber.Substring(0, 4);
                     var documentAllMail = book.Search(
                         String.Format("Select(Person_LastNameRUS=\"" + arrayFio[0] + "\"&Person_FirstNameRUS=\"" +

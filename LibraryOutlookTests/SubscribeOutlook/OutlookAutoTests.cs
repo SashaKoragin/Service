@@ -1,14 +1,8 @@
 ﻿using System;
-using System.IO;
-using System.Linq;
-using System.Text.RegularExpressions;
 using Domino;
-using Domino;
-using EfDatabase.Inventory.Base;
+
 using LibraryOutlook.SubscribeOutlook;
 using LotusLibrary.DbConnected;
-using LotusLibrary.DxlLotus;
-using LotusLibrary.DxlLotus.DocumentGeneration;
 using LotusLibrary.MailSender;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -63,7 +57,7 @@ namespace LibraryOutlookTests.SubscribeOutlook
             var docs = lotusMail.Search("Select($MessageID= \"<OF48F1D289.7607B3B0-ON4325857E.0041458C-4325857E.004145A7@LocalDomain>\")", null, 0);
             NotesDXLExporter export = db.Session.CreateDXLExporter();
             var t = export.Export(docs.GetFirstDocument());
-            File.WriteAllText(filename, t);
+            System.IO.File.WriteAllText(filename, t);
         }
 
         [TestMethod()]

@@ -2,11 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net.Mail;
 using System.Text.RegularExpressions;
 using EfDatabase.Inventory.MailLogicLotus;
 using LotusLibrary.MailSender;
-using MailKit;
 using MailKit.Net.Smtp;
 using MimeKit;
 
@@ -63,7 +61,7 @@ namespace LibraryOutlook.SubscribeOutlook
                             mailToClient.Body = builder.ToMessageBody();
                             try
                             {
-                                using (var smtp = new SmtpCastomClient.SmtpCastomClient())
+                                using (var smtp = new SmtpCustomClient.SmtpCustomClient())
                                 {
                                     smtp.DeliveryStatusNotificationType = DeliveryStatusNotificationType.Full;
                                     smtp.CheckCertificateRevocation = false;
@@ -140,7 +138,7 @@ namespace LibraryOutlook.SubscribeOutlook
                 mailToClient.Body = builder.ToMessageBody();
                 try
                 {
-                    using (var smtp = new SmtpCastomClient.SmtpCastomClient())
+                    using (var smtp = new SmtpCustomClient.SmtpCustomClient())
                     {
                         smtp.DeliveryStatusNotificationType = DeliveryStatusNotificationType.Full;
                         smtp.CheckCertificateRevocation = false;

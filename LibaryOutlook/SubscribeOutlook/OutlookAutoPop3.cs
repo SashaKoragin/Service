@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 using EfDatabase.Inventory.Base;
 using EfDatabase.Inventory.BaseLogic.Select;
 using EfDatabase.Inventory.MailLogicLotus;
-using EfDatabaseXsdLotusUser;
+using EfDatabase.XsdLotusUser;
 using LotusLibrary.MailSender;
 using MailKit.Net.Pop3;
 using MimeKit;
@@ -74,7 +74,7 @@ namespace LibraryOutlook.SubscribeOutlook
                                     if (calendar.Count > 0)
                                     {
                                         var calendarVks = new CalendarVks();
-                                        body = calendarVks.CalendarParser(calendar, message.MessageId);
+                                        body = calendarVks.CalendarParser(calendar, message);
                                     }
                                     var address = (MailboxAddress)message.From[0];
                                     var mailSender = address.Address;

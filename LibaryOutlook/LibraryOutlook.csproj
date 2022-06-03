@@ -95,7 +95,7 @@
   <ItemGroup>
     <Compile Include="ConfigFile\ConfigFile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SmtpCastomClient\SmtpCastomClient.cs" />
+    <Compile Include="SmtpCustomClient\SmtpCustomClient.cs" />
     <Compile Include="StartTaskOutlook\StartTaskOutlook.cs" />
     <Compile Include="SubscribeOutlook\CalendarVKS.cs" />
     <Compile Include="SubscribeOutlook\OutlookAutoPop3.cs" />

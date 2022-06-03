@@ -71,25 +71,33 @@ Patch dialog sequence:
               <Control Id="Pop3Address" Type="Edit" X="110" Y="70" Width="150" Height="15" Property="ADDRESS" Text="[ADDRESS]" Indirect="no">
                 <Property Id="ADDRESS" Value="eups.tax.nalog.ru" />
               </Control>
-              <Control Id="Text5" Type="Text" X="10" Y="90" Width="90" Height="15" Transparent="yes" NoPrefix="yes" Text="Логин:"></Control>
+              <Control Id="Text5" Type="Text" X="10" Y="90" Width="90" Height="15" Transparent="yes" NoPrefix="yes" Text="Логин от почты OIT:"></Control>
               <Control Id="Pop3Login" Type="Edit" X="110" Y="90" Width="150" Height="15" Property="LOGIN" Text="[LOGIN]" Indirect="no">
                 <Property Id="LOGIN" Value="oit.r7751@tax.gov.ru" />
               </Control>
-              <Control Id="Text6" Type="Text" X="10" Y="110" Width="90" Height="15" Transparent="yes" NoPrefix="yes" Text="Пароль:"></Control>
+              <Control Id="Text6" Type="Text" X="10" Y="110" Width="90" Height="15" Transparent="yes" NoPrefix="yes" Text="Пароль от почты OIT:"></Control>
               <Control Id="Pop3Password" Type="Edit" X="110" Y="110" Width="150" Height="15" Property="PASSWORD" Text="[PASSWORD]" Indirect="no">
-                <Property Id="PASSWORD" Value="ifns7751@" />
+                <Property Id="PASSWORD" Value="Ifns7751@" />
               </Control>
-              <Control Id="Text7" Type="Text" X="10" Y="130" Width="90" Height="15" Transparent="yes" NoPrefix="yes" Text="Сервер Lotus:"></Control>
-              <Control Id="LotusServerDb" Type="Edit" X="110" Y="130" Width="150" Height="15" Property="LOTUSSERVER" Text="[LOTUSSERVER]" Indirect="no">
-                <Property Id="LOTUSSERVER" Value="Lotus7751/I7751/R77/МНС" />
+              <Control Id="Text7" Type="Text" X="10" Y="130" Width="90" Height="15" Transparent="yes" NoPrefix="yes" Text="Логин от почты R:"></Control>
+              <Control Id="Pop3LoginR" Type="Edit" X="110" Y="130" Width="150" Height="15" Property="LOGINR" Text="[LOGINR]" Indirect="no">
+                <Property Id="LOGINR" Value="r7751@tax.gov.ru" />
               </Control>
-              <Control Id="Text8" Type="Text" X="10" Y="150" Width="90" Height="15" Transparent="yes" NoPrefix="yes" Text="Сервер Lotus:"></Control>
-              <Control Id="LotusPasswordDb" Type="Edit" X="110" Y="150" Width="150" Height="15" Property="LOTUSPASSWORD" Text="[LOTUSPASSWORD]" Indirect="no">
-                <Property Id="LOTUSPASSWORD" Value="Password" />
+              <Control Id="Text8" Type="Text" X="10" Y="150" Width="90" Height="15" Transparent="yes" NoPrefix="yes" Text="Пароль от почты R:"></Control>
+              <Control Id="Pop3PasswordR" Type="Edit" X="110" Y="150" Width="150" Height="15" Property="PASSWORDR" Text="[PASSWORDR]" Indirect="no">
+                <Property Id="PASSWORDR" Value="Ifns7751" />
               </Control>
               <Control Id="Text9" Type="Text" X="10" Y="170" Width="90" Height="15" Transparent="yes" NoPrefix="yes" Text="Сервер Lotus:"></Control>
-              <Control Id="LotusMailSendDb" Type="Edit" X="110" Y="170" Width="150" Height="15" Property="LOTUSMAILSEND" Text="[LOTUSMAILSEND]" Indirect="no">
+              <Control Id="LotusServerDb" Type="Edit" X="110" Y="170" Width="150" Height="15" Property="LOTUSSERVER" Text="[LOTUSSERVER]" Indirect="no">
+                <Property Id="LOTUSSERVER" Value="Lotus7751/I7751/R77/МНС" />
+              </Control>
+              <Control Id="Text10" Type="Text" X="10" Y="190" Width="90" Height="15" Transparent="yes" NoPrefix="yes" Text="Почтовый ящик ID:"></Control>
+              <Control Id="LotusMailSendDb" Type="Edit" X="110" Y="190" Width="150" Height="15" Property="LOTUSMAILSEND" Text="[LOTUSMAILSEND]" Indirect="no">
                 <Property Id="LOTUSMAILSEND" Value="mail\7751OI.nsf" />
+              </Control>
+              <Control Id="Text11" Type="Text" X="10" Y="210" Width="90" Height="15" Transparent="yes" NoPrefix="yes" Text="Пароль от ID:"></Control>
+              <Control Id="LotusPasswordDb" Type="Edit" X="110" Y="210" Width="150" Height="15" Property="LOTUSPASSWORD" Text="[LOTUSPASSWORD]" Indirect="no">
+                <Property Id="LOTUSPASSWORD" Value="Password" />
               </Control>
               <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="!(loc.WixUINext)">
                 <Publish Event="NewDialog" Value="VerifyReadyDlg" Order="10" />

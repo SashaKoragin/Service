@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Timers;
 using LibraryOutlook.SubscribeOutlook;
-using Org.BouncyCastle.Asn1.Cms;
 
 namespace LibraryOutlook.StartTaskOutlook
 {
@@ -47,8 +46,11 @@ namespace LibraryOutlook.StartTaskOutlook
         private void TimerMessage_Tick(object sender, EventArgs e)
         {
             OutlookAutoPop3.StartMessageOit(parameters);
-            OutlookAutoPop3.StartMessageR7751(parameters);
-            OutlookAutoSmtp.SendSmtpMessage(parameters);
+            if (parameters.IsSendMailR7751)
+            {
+                OutlookAutoPop3.StartMessageR7751(parameters);
+                OutlookAutoSmtp.SendSmtpMessage(parameters);
+            }
         }
         /// <summary>
         /// Отправка отчетов в офис консультанта плюс
@@ -58,7 +60,7 @@ namespace LibraryOutlook.StartTaskOutlook
         private void TimerSendReportConsultantPlus(object sender, EventArgs e)
         {
             DateTime date = DateTime.Now;
-            if (date.Hour == parameters.Hours && date.Minute == parameters.Minutes)
+            if (date.Hour == parameters.Hours && date.Minute == parameters.Minutes && parameters.IsSendReportPathConsultantPlus)
             {
                 OutlookAutoSmtp.SendSmtpConsultantPlusReport(parameters);
             }

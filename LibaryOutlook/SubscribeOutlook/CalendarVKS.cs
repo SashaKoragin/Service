@@ -15,8 +15,8 @@ namespace LibraryOutlook.SubscribeOutlook
         /// 
         /// </summary>
         /// <param name="collectionMessageAttach">Коллекция календарей</param>
-        /// <param name="idMessage">Ун письма</param>
-        public string CalendarParser(List<MimeEntity> collectionMessageAttach,string idMessage)
+        /// <param name="mimeMessage">Письмо из почты</param>
+        public string CalendarParser(List<MimeEntity> collectionMessageAttach, MimeMessage mimeMessage)
         {
             var mailCalendar = new MailLogicLotus();
             var calendar = new Calendar();
@@ -42,9 +42,9 @@ namespace LibraryOutlook.SubscribeOutlook
                         var dateStartPresumably = Regex.Match(contentDecode, "DTSTART;TZID=\"Russian Standard Time\":([0-9]+T[0-9]+Z?)").Value;
                         var dateEnd = Regex.Match(dateEndPresumably, "([0-9]+T[0-9]+Z?)").Value;
                         var dateStart = Regex.Match(dateStartPresumably, "([0-9]+T[0-9]+Z?)").Value;
-                        calendar.DescriptionVKS = description;
+                        calendar.DescriptionVKS = $"{description} {mimeMessage.Subject}";
                         calendar.FullDescription = descriptionAll;
-                        calendar.IdMail = idMessage;
+                        calendar.IdMail = mimeMessage.MessageId;
                         calendar.DateStart = Convert.ToDateTime(dateStart.Insert(4, "-").Insert(7, "-").Insert(13, ":").Insert(16, ":"));
                         calendar.DateFinish = Convert.ToDateTime(dateEnd.Insert(4, "-").Insert(7, "-").Insert(13, ":").Insert(16, ":"));
                         calendar.IdVKS = idVks;
@@ -52,7 +52,7 @@ namespace LibraryOutlook.SubscribeOutlook
                     }
                     catch (Exception ex)
                     {
-                        Loggers.Log4NetLogger.Error(new Exception($"Во время работы с календарем по письму {idMessage} произошла ошибка!"));
+                        Loggers.Log4NetLogger.Error(new Exception($"Во время работы с календарем по письму {mimeMessage.MessageId} произошла ошибка!"));
                         Loggers.Log4NetLogger.Error(ex);
                     }
                 }
