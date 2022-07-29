@@ -30,11 +30,9 @@ namespace LotusLibrary.MailSender
 
         public MailSender()
         {
-            
             Dispose();
             Config = new LotusConfig();
             Db = new LotusConnectedDataBase(Config.LotusIdFilePassword);
-
         }
 
         /// <summary>

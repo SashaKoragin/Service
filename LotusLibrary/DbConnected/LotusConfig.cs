@@ -10,7 +10,7 @@ namespace LotusLibrary.DbConnected
             LotusIdFilePassword = ConfigurationManager.AppSettings["LotusIdFilePassword"];
             LotusMailSend = ConfigurationManager.AppSettings["LotusMailSend"];
             PathGenerateScheme = ConfigurationManager.AppSettings["PathGenerateScheme"];
-
+            LotusImns = ConfigurationManager.AppSettings["LotusImns"];
         }
 
         /// <summary>
@@ -27,6 +27,8 @@ namespace LotusLibrary.DbConnected
         public string LotusMailSend { get; set; }
 
         public string PathGenerateScheme { get; set; }
+
+        public string LotusImns { get; set; }
 
     }
 }

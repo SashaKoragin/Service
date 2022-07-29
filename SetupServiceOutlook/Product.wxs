@@ -93,6 +93,7 @@
         <util:XmlFile Id="LotusMailSendParam" File="[#ServiceOutlook.exe.config]" Action="setValue" ElementPath="//configuration//appSettings//add[\[]@key='LotusMailSend'[\]]//@value" Value="[LOTUSMAILSEND]" SelectionLanguage="XPath" Sequence="1" />
         <util:XmlFile Id="PathGenerateScheme" File="[#ServiceOutlook.exe.config]" Action="setValue" ElementPath="//configuration//appSettings//add[\[]@key='PathGenerateScheme'[\]]//@value" Value="[INSTALLFOLDER]Mail\scheme.dxl" SelectionLanguage="XPath" Sequence="1" />
         <util:XmlFile Id="DataBase" File="[#ServiceOutlook.exe.config]" Action="setValue" ElementPath="//configuration//connectionStrings//add[\[]@name='Inventarization'[\]]//@connectionString" Value="Data Source=[SERVER];Initial Catalog=[NAME];Integrated Security=True;MultipleActiveResultSets=True" SelectionLanguage="XPath" Sequence="1" />
+        <util:XmlFile Id="LotusImnsParam" File="[#ServiceOutlook.exe.config]" Action="setValue" ElementPath="//configuration//appSettings//add[\[]@key='LotusImns'[\]]//@value" Value="[DATABASEIMNS]" SelectionLanguage="XPath" Sequence="1" />
       </Component>
 			<Component Id="Loggers.dll" Guid="ec2baafa-12e3-4ab5-bd4d-fe97192ceb1a">
 			  <File Id="Loggers.dll" Name="Loggers.dll" Source="$(var.ServiceOutlook.TargetDir)Loggers.dll" />

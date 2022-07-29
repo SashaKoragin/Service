@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using Domino;
 
@@ -17,6 +16,10 @@ namespace LotusLibrary.DbConnected
         /// View
         /// </summary>
         public NotesView NotesView { get; set; }
+        /// <summary>
+        /// Наименование БД для log
+        /// </summary>
+        public string NameDateBase { get; set; }
         /// <summary>
         /// Инициализация Пароль
         /// </summary>
@@ -54,7 +57,8 @@ namespace LotusLibrary.DbConnected
                     throw new InvalidOperationException("Фатальная ошибка нет соединения с сервером!");
                 if (Db.IsOpen)
                 {
-                    Loggers.Log4NetLogger.Info(new Exception($"База данных {Db.FileName} открыта!"));
+                    NameDateBase = Db.FileName;
+                    Loggers.Log4NetLogger.Info(new Exception($"База данных {NameDateBase} открыта!"));
                     return Db;
                 };
                 Loggers.Log4NetLogger.Error(new Exception($"База данных {Db.FileName} не открыта!"));
@@ -159,6 +163,8 @@ namespace LotusLibrary.DbConnected
             if (Session != null)
                 Marshal.ReleaseComObject(Session);
             Session = null;
+            if(NameDateBase!=null)
+                Loggers.Log4NetLogger.Info(new Exception($"База данных {NameDateBase} сброшена из ресурса процессов!"));
         }
 
         protected virtual void Dispose(bool disposing)

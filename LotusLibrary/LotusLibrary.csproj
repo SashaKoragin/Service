@@ -61,6 +61,7 @@
     <Compile Include="DxlLotus\DocumentGeneration\DocumentGenerationAllDxl.cs" />
     <Compile Include="DxlLotus\DocumentGeneration\DonloadOnCreateDxlFile.cs" />
     <Compile Include="DxlLotus\domino_6_5_5.designer.cs" />
+    <Compile Include="ImnsComparableUser\ImnsComparableUser.cs" />
     <Compile Include="MailSender\MailSender.cs" />
     <Compile Include="Mime\AllMime.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -74,6 +75,10 @@
     <ProjectReference Include="..\..\..\My\Loggers\Loggers.csproj">
       <Project>{9bac233e-ed3d-493e-b7f6-f26f8091968d}</Project>
       <Name>Loggers</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\WPFLib\WPFLib\LibaryXMLAuto\LibaryXMLAuto.csproj">
+      <Project>{A2BC3AE2-4A61-4E9E-9FA4-96A02677C79C}</Project>
+      <Name>LibaryXMLAuto</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

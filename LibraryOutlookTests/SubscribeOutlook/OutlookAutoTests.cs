@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Domino;
-
+using LibaryXMLAuto.Inventarization.ModelComparableUserAllSystem;
 using LibraryOutlook.SubscribeOutlook;
 using LotusLibrary.DbConnected;
+using LotusLibrary.ImnsComparableUser;
 using LotusLibrary.MailSender;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -35,16 +38,10 @@ namespace LibraryOutlookTests.SubscribeOutlook
         [TestMethod()]
         public void TestDocumentView()
         {
-            //LotusConnectedDataBase db = new LotusConnectedDataBase(); 
-            //var lotusMail = db.LotusConnectedDataBaseServer("12345", "Lotus7751/I7751/R77/МНС", "mail\\акоряг.nsf");
-
-            //DocumentGenerationAllDxl document = new DocumentGenerationAllDxl(lotusMail);
-            //document.DocumentGenerationMailMemo("D:\\Скан согласования.pdf");
-            //DonloadOnCreateDxlFile download = new DonloadOnCreateDxlFile();
-            //download.DxlFileSave("D:\\file.dxl", document.Document, typeof(note));
-            //var noteId = download.ImportDxlFile("D:\\file.dxl", lotusMail);
-            //var docSave = lotusMail.GetDocumentByID(noteId);
-            //docSave.Send(false);
+            ImnsComparableUser modelImns = new ImnsComparableUser();
+            var model = modelImns.FindAllUsersAndAttribute();
+            var t =  model.FullModelUserAllSystem.Where(x => x.Surname == "Иванов").FirstOrDefault();
+            modelImns.Dispose();
         }
 
         [TestMethod()]

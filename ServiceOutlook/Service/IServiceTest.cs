@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using LibaryXMLAuto.Inventarization.ModelComparableUserAllSystem;
 using System.ServiceModel;
 using System.ServiceModel.Web;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace ServiceOutlook.Service
@@ -12,7 +9,7 @@ namespace ServiceOutlook.Service
     interface IServiceTest
     {
         /// <summary>
-        /// http://localhost:8182/Inventarka/GenerateSqlSelect
+        /// http://77068-app065:8585/ServiceOutlook/Test
         /// Генерация запросов на клиент
         /// </summary>
         /// <returns></returns>
@@ -20,5 +17,14 @@ namespace ServiceOutlook.Service
         [WebInvoke(Method = "GET", RequestFormat = WebMessageFormat.Json, UriTemplate = "/Test", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.Bare)]
         string GenerateSqlSelect();
 
+        /// <summary>
+        /// http://77068-app065:8585/ServiceOutlook/AllUsersLotusNotes
+        /// Генерация запросов на клиент
+        /// </summary>
+        /// <returns></returns>
+        [OperationContract]
+        [WebInvoke(Method = "GET", RequestFormat = WebMessageFormat.Json, UriTemplate = "/AllUsersLotusNotes",
+            ResponseFormat = WebMessageFormat.Xml, BodyStyle = WebMessageBodyStyle.Bare)]
+       Task<ModelComparableUser> AllUsersLotusNotes();
     }
 }

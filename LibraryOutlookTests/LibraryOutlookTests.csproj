@@ -94,6 +94,10 @@
       <Project>{578cf45e-310b-4e2e-9c94-5a9f16b736ae}</Project>
       <Name>EfDatabase</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\WPFLib\WPFLib\LibaryXMLAuto\LibaryXMLAuto.csproj">
+      <Project>{A2BC3AE2-4A61-4E9E-9FA4-96A02677C79C}</Project>
+      <Name>LibaryXMLAuto</Name>
+    </ProjectReference>
     <ProjectReference Include="..\LibaryOutlook\LibraryOutlook.csproj">
       <Project>{7EBCB94D-B049-4252-A5C3-47F6A8008B95}</Project>
       <Name>LibraryOutlook</Name>

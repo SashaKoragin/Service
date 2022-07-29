@@ -136,9 +136,17 @@
       <Project>{9bac233e-ed3d-493e-b7f6-f26f8091968d}</Project>
       <Name>Loggers</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\WPFLib\WPFLib\LibaryXMLAuto\LibaryXMLAuto.csproj">
+      <Project>{A2BC3AE2-4A61-4E9E-9FA4-96A02677C79C}</Project>
+      <Name>LibaryXMLAuto</Name>
+    </ProjectReference>
     <ProjectReference Include="..\LibaryOutlook\LibraryOutlook.csproj">
       <Project>{7ebcb94d-b049-4252-a5c3-47f6a8008b95}</Project>
       <Name>LibraryOutlook</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\LotusLibrary\LotusLibrary.csproj">
+      <Project>{39512AA8-F944-46FA-96CE-295F7494ED26}</Project>
+      <Name>LotusLibrary</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

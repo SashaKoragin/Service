@@ -57,7 +57,7 @@ Patch dialog sequence:
             <Dialog Id="Setting" Width="370" Height="270" Title="Настройки параметров!">
               <Control Id="Text1" Type="Text" X="10" Y="10" Width="90" Height="15" Transparent="yes" NoPrefix="yes" Text="Имя сервера:"></Control>
               <Control Id="NameServer" Type="Edit" X="110" Y="10" Width="150" Height="15" Property="SERVER" Text="[SERVER]" Indirect="no">
-                <Property Id="SERVER" Value="i7751-app127"/>
+                <Property Id="SERVER" Value="77068-app065"/>
               </Control>
               <Control Id="Text2" Type="Text" X="10" Y="30" Width="90" Height="15" Transparent="yes" NoPrefix="yes" Text="Имя БД:"></Control>
               <Control Id="NameDb" Type="Edit" X="110" Y="30" Width="150" Height="15" Property="NAME" Text="[NAME]" Indirect="no">
@@ -98,6 +98,10 @@ Patch dialog sequence:
               <Control Id="Text11" Type="Text" X="10" Y="210" Width="90" Height="15" Transparent="yes" NoPrefix="yes" Text="Пароль от ID:"></Control>
               <Control Id="LotusPasswordDb" Type="Edit" X="110" Y="210" Width="150" Height="15" Property="LOTUSPASSWORD" Text="[LOTUSPASSWORD]" Indirect="no">
                 <Property Id="LOTUSPASSWORD" Value="Password" />
+              </Control>
+              <Control Id="Text12" Type="Text" X="10" Y="230" Width="90" Height="15" Transparent="yes" NoPrefix="yes" Text="БД ИМНС справочник:"></Control>
+              <Control Id="DataBaseImns" Type="Edit" X="110" Y="230" Width="150" Height="15" Property="DATABASEIMNS" Text="[DATABASEIMNS]" Indirect="no">
+                <Property Id="DATABASEIMNS" Value="IFNS\itstaff_imns.nsf" />
               </Control>
               <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="!(loc.WixUINext)">
                 <Publish Event="NewDialog" Value="VerifyReadyDlg" Order="10" />
