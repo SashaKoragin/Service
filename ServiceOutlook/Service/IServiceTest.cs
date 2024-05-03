@@ -19,12 +19,12 @@ namespace ServiceOutlook.Service
 
         /// <summary>
         /// http://77068-app065:8585/ServiceOutlook/AllUsersLotusNotes
+        /// http://localhost:8585/ServiceOutlook/AllUsersLotusNotes
         /// Генерация запросов на клиент
         /// </summary>
         /// <returns></returns>
         [OperationContract]
-        [WebInvoke(Method = "GET", RequestFormat = WebMessageFormat.Json, UriTemplate = "/AllUsersLotusNotes",
-            ResponseFormat = WebMessageFormat.Xml, BodyStyle = WebMessageBodyStyle.Bare)]
+        [WebInvoke(Method = "GET", RequestFormat = WebMessageFormat.Json, UriTemplate = "/AllUsersLotusNotes", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.Bare)]
        Task<ModelComparableUser> AllUsersLotusNotes();
     }
 }

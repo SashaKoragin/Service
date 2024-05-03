@@ -85,7 +85,7 @@ Patch dialog sequence:
               </Control>
               <Control Id="Text8" Type="Text" X="10" Y="150" Width="90" Height="15" Transparent="yes" NoPrefix="yes" Text="Пароль от почты R:"></Control>
               <Control Id="Pop3PasswordR" Type="Edit" X="110" Y="150" Width="150" Height="15" Property="PASSWORDR" Text="[PASSWORDR]" Indirect="no">
-                <Property Id="PASSWORDR" Value="Ifns7751" />
+                <Property Id="PASSWORDR" Value="ErtDfg!@1" />
               </Control>
               <Control Id="Text9" Type="Text" X="10" Y="170" Width="90" Height="15" Transparent="yes" NoPrefix="yes" Text="Сервер Lotus:"></Control>
               <Control Id="LotusServerDb" Type="Edit" X="110" Y="170" Width="150" Height="15" Property="LOTUSSERVER" Text="[LOTUSSERVER]" Indirect="no">

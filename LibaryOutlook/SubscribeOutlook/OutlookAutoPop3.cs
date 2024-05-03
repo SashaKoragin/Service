@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
 using System.Text.RegularExpressions;
 using EfDatabase.Inventory.Base;
 using EfDatabase.Inventory.BaseLogic.Select;
@@ -9,6 +11,7 @@ using EfDatabase.Inventory.MailLogicLotus;
 using EfDatabase.XsdLotusUser;
 using LotusLibrary.MailSender;
 using MailKit.Net.Pop3;
+using MailKit.Security;
 using MimeKit;
 
 
@@ -29,7 +32,8 @@ namespace LibraryOutlook.SubscribeOutlook
               ZipAttachments zip = new ZipAttachments();
                 using (Pop3Client client = new Pop3Client())
                 {
-                    client.CheckCertificateRevocation = false;
+                    client.ServerCertificateValidationCallback = (sender, certificate, chain, errors) => true;
+                    client.CheckCertificateRevocation = true;
                     client.Connect(parameters.Pop3Address, 995, true);
                     MailSender mail = new MailSender();
                     Loggers.Log4NetLogger.Info(new Exception($"Соединение с сервером eups.tax.nalog.ru установлено (OIT)"));
@@ -69,12 +73,12 @@ namespace LibraryOutlook.SubscribeOutlook
                             var date = message.Date;
                             if (date.Date >= DateTime.Now.Date)
                             {
-                                if (!mailSave.IsExistsBdMail(message.MessageId))
-                                {
+                               if (!mailSave.IsExistsBdMail(message.MessageId))
+                               {
                                     if (calendar.Count > 0)
                                     {
                                         var calendarVks = new CalendarVks();
-                                        body = calendarVks.CalendarParser(calendar, message);
+                                        body = calendarVks.CalendarParserSamoware(calendar, message);
                                     }
                                     var address = (MailboxAddress)message.From[0];
                                     var mailSender = address.Address;
@@ -112,7 +116,7 @@ namespace LibraryOutlook.SubscribeOutlook
                                     }
                                     count++;
                                     Loggers.Log4NetLogger.Info(new Exception($"УН: {mailMessage.IdMail} Дата/Время: {date} От кого: {mailMessage.MailAdress}"));
-                                }
+                               }
                             }
                             else
                             {
@@ -154,6 +158,7 @@ namespace LibraryOutlook.SubscribeOutlook
                 ZipAttachments zip = new ZipAttachments();
                 using (Pop3Client client = new Pop3Client())
                 {
+                    client.ServerCertificateValidationCallback = (sender, certificate, chain, errors) => true;
                     client.CheckCertificateRevocation = false;
                     client.Connect(parameters.Pop3Address, 995, true);
                     MailSender mail = new MailSender();

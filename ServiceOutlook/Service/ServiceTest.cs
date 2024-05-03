@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using LibaryXMLAuto.Inventarization.ModelComparableUserAllSystem;
+using LibaryXMLAuto.ReadOrWrite;
+using LibaryXMLAuto.ReadOrWrite.SerializationJson;
 using LotusLibrary.ImnsComparableUser;
 
 namespace ServiceOutlook.Service
@@ -20,7 +22,7 @@ namespace ServiceOutlook.Service
         /// <returns></returns>
         public async Task<ModelComparableUser> AllUsersLotusNotes()
         {
-             return await Task.Factory.StartNew(() =>
+            return await Task.Factory.StartNew(() =>
             {
                 ImnsComparableUser modelImns = new ImnsComparableUser();
                 var model = modelImns.FindAllUsersAndAttribute();

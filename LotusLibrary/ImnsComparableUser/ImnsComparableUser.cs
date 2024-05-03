@@ -69,11 +69,12 @@ namespace LotusLibrary.ImnsComparableUser
                             modelUsers.Name = DocumentUsers.GetItemValue("FirstName")[0];
                             modelUsers.Patronymic = DocumentUsers.GetItemValue("Person_MiddleName")[0];
                             modelUsers.FullName = DocumentUsers.GetItemValue("Person_Name")[0];
-                            modelUsers.Department = DocumentDepartment.GetItemValue("Dep_Name")[0];
+                            modelUsers.Department = repDep;
                             modelUsers.JobTitle = DocumentUsers.GetItemValue("Person_Post")[0];
                             modelUsers.Ranks = DocumentUsers.GetItemValue("Person_Title")[0];
-                            modelUsers.Room = null;
-                            modelUsers.Telephon = DocumentUsers.GetItemValue("Comm_Phone")[0];
+                            modelUsers.Room = DocumentUsers.GetItemValue("Comm_Location")[0];
+                            modelUsers.PhoneNumber = DocumentUsers.GetItemValue("Comm_Phone")[0]+"&"+DocumentUsers.GetItemValue("Comm_Ext")[0] ;
+                            modelUsers.TypePhone = 1;
                             modelUsers.NameMail = DocumentUsers.GetItemValue("MailAddress")[0];
                             modelList.Add(modelUsers);
                         }
@@ -81,7 +82,7 @@ namespace LotusLibrary.ImnsComparableUser
                     }
                     DocumentDepartment = DocumentCollectionDepartment.GetNextDocument(DocumentDepartment);
                 }
-                modelComparableUsers.FullModelUserAllSystem = modelList.ToArray();
+                modelComparableUsers.FullModelUserAllSystem = modelList;
             }
             catch (Exception ex)
             {
@@ -106,6 +107,66 @@ namespace LotusLibrary.ImnsComparableUser
             }
             return modelComparableUsers;
         }
+        /// <summary>
+        /// Поиск ЗГ в лотус 8.5 по ИНН 662335054126
+        /// </summary>
+        /// <param name="inn">ИНН</param>
+        public List<ModelFindZg.ModelFindZg> FindLotusNotesZg(string[] inn)
+        {
+            try
+            {
+                var modelZg = new List<ModelFindZg.ModelFindZg>();
+      
+                Db.LotusConnectedDataBaseServer(Config.LotusServer, "IFNS\\2012\\itof_zg_2012.nsf");
+                foreach (var i in inn)
+                {
+                    var index = i.Split(' ');
+                    DocumentCollectionUsers = Db.Db.Search(String.Format("@Select(@Contains(IO_INN;\"{0}\"))", index[0]), null, 0);
+                    DocumentUsers = DocumentCollectionUsers.GetFirstDocument();
+                    while (DocumentUsers != null)
+                    {
+                        modelZg.Add(new ModelFindZg.ModelFindZg()
+                        {
+                            FioFindMemo = i,
+                            FioFindLotus = DocumentUsers.GetItemValue("InetFromName")[0],
+                            Inn = DocumentUsers.GetItemValue("IO_INN")[0],
+                            ZgNumber = DocumentUsers.GetItemValue("InCard_Index")[0],
+                            InCard_RgDate = Convert.ToDateTime(DocumentUsers.GetItemValue("InCard_RgDate")[0]),
+                            Ex_ExecDirect = DocumentUsers.GetItemValue("Ex_ExecDirect")[0],
+                            Dept = DocumentUsers.GetItemValue("IOT_DEPT")[0],
+                            OutNumber = DocumentUsers.GetItemValue("Ex_ExecutionMarks")[0],
+                            CheckUpDate = string.IsNullOrWhiteSpace(DocumentUsers.GetItemValue("ctbCheckUpDate")?[0].ToString()) ? null : Convert.ToDateTime(DocumentUsers.GetItemValue("ctbCheckUpDate")[0]),
+                            Number = DocumentUsers.GetItemValue("InCard_RespOutNum")[0],
+                        });
+                        DocumentUsers = DocumentCollectionUsers.GetNextDocument(DocumentUsers);
+                    }
+                }
+                return modelZg;
+            }
+            catch (Exception ex)
+            {
+                Loggers.Log4NetLogger.Error(ex);
+                throw;
+            }
+            finally
+            {
+                if (DocumentDepartment != null)
+                    Marshal.ReleaseComObject(DocumentDepartment);
+                DocumentDepartment = null;
+                if (DocumentUsers != null)
+                    Marshal.ReleaseComObject(DocumentUsers);
+                DocumentUsers = null;
+                if (DocumentCollectionDepartment != null)
+                    Marshal.ReleaseComObject(DocumentCollectionDepartment);
+                DocumentCollectionDepartment = null;
+                if (DocumentCollectionUsers != null)
+                    Marshal.ReleaseComObject(DocumentCollectionUsers);
+                DocumentCollectionUsers = null;
+                Loggers.Log4NetLogger.Info(new Exception("Сбор данных по справочнику ИМНС Завершен!!!"));
+            }
+        }
+
+
         private void ReleaseUnmanagedResources()
         {
 
@@ -123,7 +184,7 @@ namespace LotusLibrary.ImnsComparableUser
         public void Dispose()
         {
             Dispose(true);
-            //  GC.SuppressFinalize(this);
+              //GC.SuppressFinalize(this);
         }
 
         ~ImnsComparableUser()

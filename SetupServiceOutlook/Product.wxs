@@ -131,6 +131,9 @@
       <Component Id="MimeKit.dll" Guid="8E31A05E-6826-4837-9A5D-9EEA63D6C430">
         <File Id="MimeKit.dll" Name="MimeKit.dll" Source="$(var.ServiceOutlook.TargetDir)MimeKit.dll"/>
       </Component>
+      <Component Id="Newtonsoft.Json.dll" Guid="260C7D1C-D3D3-4768-A737-767D8B457269">
+        <File Id="Newtonsoft.Json.dll" Name="Newtonsoft.Json.dll" Source="$(var.ServiceOutlook.TargetDir)Newtonsoft.Json.dll"/>
+      </Component>
 		</ComponentGroup>
 	</Fragment>
 </Wix>

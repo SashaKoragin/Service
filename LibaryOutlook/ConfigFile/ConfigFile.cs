@@ -14,7 +14,8 @@ namespace LibraryOutlook.ConfigFile
             PathSaveArchive = ConfigurationManager.AppSettings["PathSaveArchive"];
             LoginR7751 = ConfigurationManager.AppSettings["LoginR7751"];
             PasswordR7751 = ConfigurationManager.AppSettings["PasswordR7751"];
-            IsSendMailR7751 = Convert.ToBoolean(ConfigurationManager.AppSettings["IsSendMailR7751"]);
+            IsSendMailOit7751 = Convert.ToBoolean(ConfigurationManager.AppSettings["IsSendMailOit7751"]);
+            IsReceptionR7751 = Convert.ToBoolean(ConfigurationManager.AppSettings["IsReceptionR7751"]);
             Interval = ConfigurationManager.AppSettings["Interval"];
             //Настройки обратной связи с Консультант+
             Hours = Convert.ToInt32(ConfigurationManager.AppSettings["Hours"]);
@@ -84,9 +85,13 @@ namespace LibraryOutlook.ConfigFile
         /// </summary>
         public string PathConsultantPlusSts { get; set; }
         /// <summary>
-        /// Отправка почты/прием R7751
+        /// Отправка почты c Oit7751
         /// </summary>
-        public bool IsSendMailR7751 { get; set; }
+        public bool IsSendMailOit7751 { get; set; }
+        /// <summary>
+        /// Прием почты с R7751
+        /// </summary>
+        public bool IsReceptionR7751 { get; set; }
         /// <summary>
         /// Отправка отчетов ConsultantPlus
         /// </summary>

@@ -18,7 +18,7 @@ namespace LibraryOutlook.SubscribeOutlook
         /// Отправка писем абоненту внешней почты 
         /// </summary>
         /// <param name="parameters">Параметры конфигурации</param>
-        public void SendSmtpMessage(ConfigFile.ConfigFile parameters)
+        public void SendSmtpMessageOit(ConfigFile.ConfigFile parameters)
         {
             try
             {
@@ -53,11 +53,11 @@ namespace LibraryOutlook.SubscribeOutlook
                             MimeMessage mailToClient = new MimeMessage();
                             mailToClient.To.Add(new MailboxAddress(mail));
                             mailToClient.Subject = string.IsNullOrWhiteSpace(mailLotusOutlookOut.SubjectMail) ? "" : mailLotusOutlookOut.SubjectMail;
-                            mailToClient.From.Add(new MailboxAddress(mailLotusOutlookOut.MailAdressIn, parameters.LoginR7751)); //Сюда идентификатор
+                            mailToClient.From.Add(new MailboxAddress(mailLotusOutlookOut.MailAdressIn, parameters.LoginOit)); //Сюда идентификатор
                             mailToClient.Headers[HeaderId.MessageId] = mailToClient.MessageId;
                             mailToClient.Headers[HeaderId.ResentMessageId] = mailToClient.MessageId;
-                            mailToClient.Headers[HeaderId.DispositionNotificationTo] = parameters.LoginR7751;
-                            mailToClient.Headers[HeaderId.ReturnReceiptTo] = parameters.LoginR7751;
+                            mailToClient.Headers[HeaderId.DispositionNotificationTo] = parameters.LoginOit;
+                            mailToClient.Headers[HeaderId.ReturnReceiptTo] = parameters.LoginOit;
                             mailToClient.Body = builder.ToMessageBody();
                             try
                             {
@@ -65,8 +65,9 @@ namespace LibraryOutlook.SubscribeOutlook
                                 {
                                     smtp.DeliveryStatusNotificationType = DeliveryStatusNotificationType.Full;
                                     smtp.CheckCertificateRevocation = false;
+                                    smtp.ServerCertificateValidationCallback = (sender, certificate, chain, errors) => true;
                                     smtp.Connect(parameters.Pop3Address, 465, true);
-                                    smtp.Authenticate(parameters.LoginR7751, parameters.PasswordR7751);
+                                    smtp.Authenticate(parameters.LoginOit, parameters.PasswordOit);
                                     smtp.Send(mailToClient);
                                     smtp.Disconnect(true);
                                 }
@@ -129,11 +130,11 @@ namespace LibraryOutlook.SubscribeOutlook
                 MimeMessage mailToClient = new MimeMessage();
                 mailToClient.To.Add(new MailboxAddress(parameters.MailReport));
                 mailToClient.Subject = "Отчеты по папкам Receive, ReceiveTemp, Sts ";
-                mailToClient.From.Add(new MailboxAddress("Автоматическая рассылка писем!", parameters.LoginR7751)); //Сюда идентификатор
+                mailToClient.From.Add(new MailboxAddress("Автоматическая рассылка писем!", parameters.LoginOit)); //Сюда идентификатор
                 mailToClient.Headers[HeaderId.MessageId] = mailToClient.MessageId;
                 mailToClient.Headers[HeaderId.ResentMessageId] = mailToClient.MessageId;
-                mailToClient.Headers[HeaderId.DispositionNotificationTo] = parameters.LoginR7751;
-                mailToClient.Headers[HeaderId.ReturnReceiptTo] = parameters.LoginR7751;
+                mailToClient.Headers[HeaderId.DispositionNotificationTo] = parameters.LoginOit;
+                mailToClient.Headers[HeaderId.ReturnReceiptTo] = parameters.LoginOit;
 
                 mailToClient.Body = builder.ToMessageBody();
                 try
@@ -142,8 +143,9 @@ namespace LibraryOutlook.SubscribeOutlook
                     {
                         smtp.DeliveryStatusNotificationType = DeliveryStatusNotificationType.Full;
                         smtp.CheckCertificateRevocation = false;
+                        smtp.ServerCertificateValidationCallback = (sender, certificate, chain, errors) => true;
                         smtp.Connect(parameters.Pop3Address, 465, true);
-                        smtp.Authenticate(parameters.LoginR7751, parameters.PasswordR7751);
+                        smtp.Authenticate(parameters.LoginOit, parameters.PasswordOit);
                         smtp.Send(mailToClient);
                         smtp.Disconnect(true);
                     }

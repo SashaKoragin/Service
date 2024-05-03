@@ -46,11 +46,12 @@ namespace LibraryOutlook.StartTaskOutlook
         private void TimerMessage_Tick(object sender, EventArgs e)
         {
             OutlookAutoPop3.StartMessageOit(parameters);
-            if (parameters.IsSendMailR7751)
+            if (parameters.IsSendMailOit7751)
             {
-                OutlookAutoPop3.StartMessageR7751(parameters);
-                OutlookAutoSmtp.SendSmtpMessage(parameters);
+                OutlookAutoSmtp.SendSmtpMessageOit(parameters);
             }
+            if (!parameters.IsReceptionR7751) return;
+            OutlookAutoPop3.StartMessageR7751(parameters);
         }
         /// <summary>
         /// Отправка отчетов в офис консультанта плюс
