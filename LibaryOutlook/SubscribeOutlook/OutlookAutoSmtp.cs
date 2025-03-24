@@ -53,11 +53,11 @@ namespace LibraryOutlook.SubscribeOutlook
                             MimeMessage mailToClient = new MimeMessage();
                             mailToClient.To.Add(new MailboxAddress(mail));
                             mailToClient.Subject = string.IsNullOrWhiteSpace(mailLotusOutlookOut.SubjectMail) ? "" : mailLotusOutlookOut.SubjectMail;
-                            mailToClient.From.Add(new MailboxAddress(mailLotusOutlookOut.MailAdressIn, parameters.LoginOit)); //Сюда идентификатор
+                            mailToClient.From.Add(new MailboxAddress(mailLotusOutlookOut.MailAdressIn, parameters.LoginMy)); //Сюда идентификатор
                             mailToClient.Headers[HeaderId.MessageId] = mailToClient.MessageId;
                             mailToClient.Headers[HeaderId.ResentMessageId] = mailToClient.MessageId;
-                            mailToClient.Headers[HeaderId.DispositionNotificationTo] = parameters.LoginOit;
-                            mailToClient.Headers[HeaderId.ReturnReceiptTo] = parameters.LoginOit;
+                            mailToClient.Headers[HeaderId.DispositionNotificationTo] = parameters.LoginMy;
+                            mailToClient.Headers[HeaderId.ReturnReceiptTo] = parameters.LoginMy;
                             mailToClient.Body = builder.ToMessageBody();
                             try
                             {
@@ -67,7 +67,7 @@ namespace LibraryOutlook.SubscribeOutlook
                                     smtp.CheckCertificateRevocation = false;
                                     smtp.ServerCertificateValidationCallback = (sender, certificate, chain, errors) => true;
                                     smtp.Connect(parameters.Pop3Address, 465, true);
-                                    smtp.Authenticate(parameters.LoginOit, parameters.PasswordOit);
+                                    smtp.Authenticate(parameters.LoginMy, parameters.PasswordMy);
                                     smtp.Send(mailToClient);
                                     smtp.Disconnect(true);
                                 }
@@ -130,11 +130,11 @@ namespace LibraryOutlook.SubscribeOutlook
                 MimeMessage mailToClient = new MimeMessage();
                 mailToClient.To.Add(new MailboxAddress(parameters.MailReport));
                 mailToClient.Subject = "Отчеты по папкам Receive, ReceiveTemp, Sts ";
-                mailToClient.From.Add(new MailboxAddress("Автоматическая рассылка писем!", parameters.LoginOit)); //Сюда идентификатор
+                mailToClient.From.Add(new MailboxAddress("Автоматическая рассылка писем!", parameters.LoginMy)); //Сюда идентификатор
                 mailToClient.Headers[HeaderId.MessageId] = mailToClient.MessageId;
                 mailToClient.Headers[HeaderId.ResentMessageId] = mailToClient.MessageId;
-                mailToClient.Headers[HeaderId.DispositionNotificationTo] = parameters.LoginOit;
-                mailToClient.Headers[HeaderId.ReturnReceiptTo] = parameters.LoginOit;
+                mailToClient.Headers[HeaderId.DispositionNotificationTo] = parameters.LoginMy;
+                mailToClient.Headers[HeaderId.ReturnReceiptTo] = parameters.LoginMy;
 
                 mailToClient.Body = builder.ToMessageBody();
                 try
@@ -145,7 +145,7 @@ namespace LibraryOutlook.SubscribeOutlook
                         smtp.CheckCertificateRevocation = false;
                         smtp.ServerCertificateValidationCallback = (sender, certificate, chain, errors) => true;
                         smtp.Connect(parameters.Pop3Address, 465, true);
-                        smtp.Authenticate(parameters.LoginOit, parameters.PasswordOit);
+                        smtp.Authenticate(parameters.LoginMy, parameters.PasswordMy);
                         smtp.Send(mailToClient);
                         smtp.Disconnect(true);
                     }

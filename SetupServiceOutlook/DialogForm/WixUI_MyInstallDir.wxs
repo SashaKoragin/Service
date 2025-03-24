@@ -71,13 +71,13 @@ Patch dialog sequence:
               <Control Id="Pop3Address" Type="Edit" X="110" Y="70" Width="150" Height="15" Property="ADDRESS" Text="[ADDRESS]" Indirect="no">
                 <Property Id="ADDRESS" Value="eups.tax.nalog.ru" />
               </Control>
-              <Control Id="Text5" Type="Text" X="10" Y="90" Width="90" Height="15" Transparent="yes" NoPrefix="yes" Text="Логин от почты OIT:"></Control>
+              <Control Id="Text5" Type="Text" X="10" Y="90" Width="90" Height="15" Transparent="yes" NoPrefix="yes" Text="Логин от почты My:"></Control>
               <Control Id="Pop3Login" Type="Edit" X="110" Y="90" Width="150" Height="15" Property="LOGIN" Text="[LOGIN]" Indirect="no">
-                <Property Id="LOGIN" Value="oit.r7751@tax.gov.ru" />
+                <Property Id="LOGIN" Value="a.koryagin.r7751@tax.gov.ru" />
               </Control>
-              <Control Id="Text6" Type="Text" X="10" Y="110" Width="90" Height="15" Transparent="yes" NoPrefix="yes" Text="Пароль от почты OIT:"></Control>
+              <Control Id="Text6" Type="Text" X="10" Y="110" Width="90" Height="15" Transparent="yes" NoPrefix="yes" Text="Пароль от почты My:"></Control>
               <Control Id="Pop3Password" Type="Edit" X="110" Y="110" Width="150" Height="15" Property="PASSWORD" Text="[PASSWORD]" Indirect="no">
-                <Property Id="PASSWORD" Value="Password" />
+                <Property Id="PASSWORD" Value="Qwerty1234567890%" />
               </Control>
               <Control Id="Text7" Type="Text" X="10" Y="130" Width="90" Height="15" Transparent="yes" NoPrefix="yes" Text="Логин от почты R:"></Control>
               <Control Id="Pop3LoginR" Type="Edit" X="110" Y="130" Width="150" Height="15" Property="LOGINR" Text="[LOGINR]" Indirect="no">

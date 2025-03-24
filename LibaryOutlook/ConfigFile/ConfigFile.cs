@@ -9,12 +9,12 @@ namespace LibraryOutlook.ConfigFile
         public ConfigFile()
         {
             Pop3Address = ConfigurationManager.AppSettings["Pop3Address"];
-            LoginOit = ConfigurationManager.AppSettings["LoginOit"];
-            PasswordOit = ConfigurationManager.AppSettings["PasswordOit"];
+            LoginMy = ConfigurationManager.AppSettings["LoginMy"];
+            PasswordMy = ConfigurationManager.AppSettings["PasswordMy"];
             PathSaveArchive = ConfigurationManager.AppSettings["PathSaveArchive"];
             LoginR7751 = ConfigurationManager.AppSettings["LoginR7751"];
             PasswordR7751 = ConfigurationManager.AppSettings["PasswordR7751"];
-            IsSendMailOit7751 = Convert.ToBoolean(ConfigurationManager.AppSettings["IsSendMailOit7751"]);
+            IsSendMailMy = Convert.ToBoolean(ConfigurationManager.AppSettings["IsSendMailMy"]);
             IsReceptionR7751 = Convert.ToBoolean(ConfigurationManager.AppSettings["IsReceptionR7751"]);
             Interval = ConfigurationManager.AppSettings["Interval"];
             //Настройки обратной связи с Консультант+
@@ -39,11 +39,11 @@ namespace LibraryOutlook.ConfigFile
         /// <summary>
         /// Логин
         /// </summary>
-        public string LoginOit { get; set; }
+        public string LoginMy { get; set; }
         /// <summary>
         /// Пароль
         /// </summary>
-        public string PasswordOit { get; set; }
+        public string PasswordMy { get; set; }
         /// <summary>
         /// Почта общая Login
         /// </summary>
@@ -87,7 +87,7 @@ namespace LibraryOutlook.ConfigFile
         /// <summary>
         /// Отправка почты c Oit7751
         /// </summary>
-        public bool IsSendMailOit7751 { get; set; }
+        public bool IsSendMailMy { get; set; }
         /// <summary>
         /// Прием почты с R7751
         /// </summary>

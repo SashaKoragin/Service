@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net.Security;
-using System.Security.Cryptography.X509Certificates;
 using System.Text.RegularExpressions;
 using EfDatabase.Inventory.Base;
 using EfDatabase.Inventory.BaseLogic.Select;
@@ -11,7 +9,6 @@ using EfDatabase.Inventory.MailLogicLotus;
 using EfDatabase.XsdLotusUser;
 using LotusLibrary.MailSender;
 using MailKit.Net.Pop3;
-using MailKit.Security;
 using MimeKit;
 
 
@@ -37,7 +34,7 @@ namespace LibraryOutlook.SubscribeOutlook
                     client.Connect(parameters.Pop3Address, 995, true);
                     MailSender mail = new MailSender();
                     Loggers.Log4NetLogger.Info(new Exception($"Соединение с сервером eups.tax.nalog.ru установлено (OIT)"));
-                    client.Authenticate(parameters.LoginOit, parameters.PasswordOit);
+                    client.Authenticate(parameters.LoginMy, parameters.PasswordMy);
                     Loggers.Log4NetLogger.Info(new Exception($"Пользователь проверен (OIT)"));
                     if (client.IsConnected)
                     {
@@ -87,7 +84,7 @@ namespace LibraryOutlook.SubscribeOutlook
                                     MailLotusOutlookIn mailMessage = new MailLotusOutlookIn()
                                     {
                                         IdMail = message.MessageId,
-                                        MailAdressSend = parameters.LoginOit,
+                                        MailAdressSend = parameters.LoginMy,
                                         SubjectMail = message.Subject,
                                         Body = body,
                                         MailAdress = mailSender,

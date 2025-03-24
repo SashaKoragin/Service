@@ -46,7 +46,7 @@ namespace LibraryOutlook.StartTaskOutlook
         private void TimerMessage_Tick(object sender, EventArgs e)
         {
             OutlookAutoPop3.StartMessageOit(parameters);
-            if (parameters.IsSendMailOit7751)
+            if (parameters.IsSendMailMy)
             {
                 OutlookAutoSmtp.SendSmtpMessageOit(parameters);
             }
